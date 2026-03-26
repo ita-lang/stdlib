@@ -1,0 +1,1010 @@
+// Foundation: Collections
+// Estruturas de dados avançadas, grafos e algoritmos de sorting
+
+// ============================================================
+// Stack<T> — LIFO
+// ============================================================
+
+struct Stack<T> {
+  items: List<T>
+
+  fn new() -> Stack<T> => Stack { items: [] }
+
+  fn push(self, value: T) -> Stack<T> {
+    return Stack { items: self.items + [value] }
+  }
+
+  fn pop(self) -> Option<(T, Stack<T>)> {
+    if self.items.length == 0 { return .none }
+    let top = self.items[self.items.length - 1]
+    let rest = self.items.slice(0, self.items.length - 1)
+    return .some((top, Stack { items: rest }))
+  }
+
+  fn peek(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    return .some(self.items[self.items.length - 1])
+  }
+
+  fn isEmpty(self) -> Bool => self.items.length == 0
+  fn size(self) -> Int => self.items.length
+  fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// Queue<T> — FIFO
+// ============================================================
+
+struct Queue<T> {
+  items: List<T>
+
+  fn new() -> Queue<T> => Queue { items: [] }
+
+  fn enqueue(self, value: T) -> Queue<T> {
+    return Queue { items: self.items + [value] }
+  }
+
+  fn dequeue(self) -> Option<(T, Queue<T>)> {
+    if self.items.length == 0 { return .none }
+    let front = self.items[0]
+    let rest = self.items.slice(1)
+    return .some((front, Queue { items: rest }))
+  }
+
+  fn peek(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    return .some(self.items[0])
+  }
+
+  fn isEmpty(self) -> Bool => self.items.length == 0
+  fn size(self) -> Int => self.items.length
+  fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// Deque<T> — Double-ended queue
+// ============================================================
+
+struct Deque<T> {
+  items: List<T>
+
+  fn new() -> Deque<T> => Deque { items: [] }
+
+  fn pushFront(self, value: T) -> Deque<T> {
+    return Deque { items: [value] + self.items }
+  }
+
+  fn pushBack(self, value: T) -> Deque<T> {
+    return Deque { items: self.items + [value] }
+  }
+
+  fn popFront(self) -> Option<(T, Deque<T>)> {
+    if self.items.length == 0 { return .none }
+    let front = self.items[0]
+    let rest = self.items.slice(1)
+    return .some((front, Deque { items: rest }))
+  }
+
+  fn popBack(self) -> Option<(T, Deque<T>)> {
+    if self.items.length == 0 { return .none }
+    let back = self.items[self.items.length - 1]
+    let rest = self.items.slice(0, self.items.length - 1)
+    return .some((back, Deque { items: rest }))
+  }
+
+  fn peekFront(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    return .some(self.items[0])
+  }
+
+  fn peekBack(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    return .some(self.items[self.items.length - 1])
+  }
+
+  fn isEmpty(self) -> Bool => self.items.length == 0
+  fn size(self) -> Int => self.items.length
+  fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// PriorityQueue<T> — Min-heap by default
+// ============================================================
+
+struct PriorityQueue<T> {
+  heap: List<T>
+  compare: (T, T) -> Int
+
+  fn new(compare: (T, T) -> Int) -> PriorityQueue<T> {
+    return PriorityQueue { heap: [], compare: compare }
+  }
+
+  fn minQueue() -> PriorityQueue<Int> {
+    return PriorityQueue.new((a, b) => a - b)
+  }
+
+  fn maxQueue() -> PriorityQueue<Int> {
+    return PriorityQueue.new((a, b) => b - a)
+  }
+
+  fn insert(self, value: T) -> PriorityQueue<T> {
+    var h = self.heap + [value]
+    var i = h.length - 1
+    while i > 0 {
+      let parent = (i - 1) / 2
+      if self.compare(h[i], h[parent]) < 0 {
+        let temp = h[i]
+        h = h.set(i, h[parent])
+        h = h.set(parent, temp)
+        i = parent
+      } else {
+        i = 0
+      }
+    }
+    return PriorityQueue { heap: h, compare: self.compare }
+  }
+
+  fn extractTop(self) -> Option<(T, PriorityQueue<T>)> {
+    if self.heap.length == 0 { return .none }
+    if self.heap.length == 1 {
+      return .some((self.heap[0], PriorityQueue { heap: [], compare: self.compare }))
+    }
+    let top = self.heap[0]
+    var h = self.heap.set(0, self.heap[self.heap.length - 1])
+    h = h.slice(0, h.length - 1)
+    // Sift down
+    var i = 0
+    while true {
+      let left = 2 * i + 1
+      let right = 2 * i + 2
+      var smallest = i
+      if left < h.length && self.compare(h[left], h[smallest]) < 0 {
+        smallest = left
+      }
+      if right < h.length && self.compare(h[right], h[smallest]) < 0 {
+        smallest = right
+      }
+      if smallest == i { return .some((top, PriorityQueue { heap: h, compare: self.compare })) }
+      let temp = h[i]
+      h = h.set(i, h[smallest])
+      h = h.set(smallest, temp)
+      i = smallest
+    }
+    return .some((top, PriorityQueue { heap: h, compare: self.compare }))
+  }
+
+  fn peek(self) -> Option<T> {
+    if self.heap.length == 0 { return .none }
+    return .some(self.heap[0])
+  }
+
+  fn isEmpty(self) -> Bool => self.heap.length == 0
+  fn size(self) -> Int => self.heap.length
+}
+
+// ============================================================
+// Ring<T> — Buffer circular de tamanho fixo
+// ============================================================
+
+struct Ring<T> {
+  items: List<T>
+  capacity: Int
+  writePos: Int
+
+  fn new(capacity: Int) -> Ring<T> {
+    return Ring { items: [], capacity: capacity, writePos: 0 }
+  }
+
+  fn push(self, value: T) -> Ring<T> {
+    if self.items.length < self.capacity {
+      return Ring {
+        items: self.items + [value],
+        capacity: self.capacity,
+        writePos: self.items.length + 1
+      }
+    }
+    let pos = self.writePos % self.capacity
+    return Ring {
+      items: self.items.set(pos, value),
+      capacity: self.capacity,
+      writePos: self.writePos + 1
+    }
+  }
+
+  fn toList(self) -> List<T> {
+    if self.items.length < self.capacity { return self.items }
+    let start = self.writePos % self.capacity
+    return self.items.slice(start) + self.items.slice(0, start)
+  }
+
+  fn isFull(self) -> Bool => self.items.length == self.capacity
+  fn size(self) -> Int => self.items.length
+}
+
+// ============================================================
+// OrderedMap<K, V> — Map que mantém ordem de inserção
+// ============================================================
+
+struct OrderedMap<K, V> {
+  keys: List<K>
+  values: List<V>
+
+  fn new() -> OrderedMap<K, V> => OrderedMap { keys: [], values: [] }
+
+  fn set(self, key: K, value: V) -> OrderedMap<K, V> {
+    var i = 0
+    while i < self.keys.length {
+      if self.keys[i] == key {
+        return OrderedMap {
+          keys: self.keys,
+          values: self.values.set(i, value)
+        }
+      }
+      i += 1
+    }
+    return OrderedMap {
+      keys: self.keys + [key],
+      values: self.values + [value]
+    }
+  }
+
+  fn get(self, key: K) -> Option<V> {
+    var i = 0
+    while i < self.keys.length {
+      if self.keys[i] == key { return .some(self.values[i]) }
+      i += 1
+    }
+    return .none
+  }
+
+  fn has(self, key: K) -> Bool {
+    for k in self.keys {
+      if k == key { return true }
+    }
+    return false
+  }
+
+  fn remove(self, key: K) -> OrderedMap<K, V> {
+    var newKeys: List<K> = []
+    var newValues: List<V> = []
+    var i = 0
+    while i < self.keys.length {
+      if self.keys[i] != key {
+        newKeys = newKeys + [self.keys[i]]
+        newValues = newValues + [self.values[i]]
+      }
+      i += 1
+    }
+    return OrderedMap { keys: newKeys, values: newValues }
+  }
+
+  fn size(self) -> Int => self.keys.length
+  fn isEmpty(self) -> Bool => self.keys.length == 0
+
+  fn entries(self) -> List<(K, V)> {
+    var result: List<(K, V)> = []
+    var i = 0
+    while i < self.keys.length {
+      result = result + [(self.keys[i], self.values[i])]
+      i += 1
+    }
+    return result
+  }
+}
+
+// ============================================================
+// OrderedSet<T> — Set que mantém ordem de inserção
+// ============================================================
+
+struct OrderedSet<T> {
+  items: List<T>
+
+  fn new() -> OrderedSet<T> => OrderedSet { items: [] }
+
+  fn add(self, value: T) -> OrderedSet<T> {
+    for item in self.items {
+      if item == value { return self }
+    }
+    return OrderedSet { items: self.items + [value] }
+  }
+
+  fn remove(self, value: T) -> OrderedSet<T> {
+    var newItems: List<T> = []
+    for item in self.items {
+      if item != value { newItems = newItems + [item] }
+    }
+    return OrderedSet { items: newItems }
+  }
+
+  fn has(self, value: T) -> Bool {
+    for item in self.items {
+      if item == value { return true }
+    }
+    return false
+  }
+
+  fn union(self, other: OrderedSet<T>) -> OrderedSet<T> {
+    var result = self
+    for item in other.items {
+      result = result.add(item)
+    }
+    return result
+  }
+
+  fn intersection(self, other: OrderedSet<T>) -> OrderedSet<T> {
+    var result = OrderedSet.new()
+    for item in self.items {
+      if other.has(item) { result = result.add(item) }
+    }
+    return result
+  }
+
+  fn difference(self, other: OrderedSet<T>) -> OrderedSet<T> {
+    var result = OrderedSet.new()
+    for item in self.items {
+      if !other.has(item) { result = result.add(item) }
+    }
+    return result
+  }
+
+  fn size(self) -> Int => self.items.length
+  fn isEmpty(self) -> Bool => self.items.length == 0
+  fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// Graph<T> — Grafo não-dirigido
+// ============================================================
+
+struct Graph<T> {
+  nodes: List<T>
+  edges: List<(Int, Int)>
+
+  fn new() -> Graph<T> => Graph { nodes: [], edges: [] }
+
+  fn addNode(self, value: T) -> Graph<T> {
+    return Graph { nodes: self.nodes + [value], edges: self.edges }
+  }
+
+  fn addEdge(self, from: Int, to: Int) -> Graph<T> {
+    return Graph { nodes: self.nodes, edges: self.edges + [(from, to)] }
+  }
+
+  fn neighbors(self, node: Int) -> List<Int> {
+    var result: List<Int> = []
+    for edge in self.edges {
+      let {a, b} = edge
+      if a == node { result = result + [b] }
+      if b == node { result = result + [a] }
+    }
+    return result
+  }
+
+  fn hasEdge(self, from: Int, to: Int) -> Bool {
+    for edge in self.edges {
+      let {a, b} = edge
+      if (a == from && b == to) || (a == to && b == from) { return true }
+    }
+    return false
+  }
+
+  fn degree(self, node: Int) -> Int => self.neighbors(node).length
+
+  fn nodeCount(self) -> Int => self.nodes.length
+  fn edgeCount(self) -> Int => self.edges.length
+
+  fn bfs(self, start: Int) -> List<Int> {
+    var visited: List<Bool> = []
+    var i = 0
+    while i < self.nodes.length {
+      visited = visited + [false]
+      i += 1
+    }
+    var queue: List<Int> = [start]
+    visited = visited.set(start, true)
+    var result: List<Int> = []
+    while queue.length > 0 {
+      let current = queue[0]
+      queue = queue.slice(1)
+      result = result + [current]
+      for neighbor in self.neighbors(current) {
+        if !visited[neighbor] {
+          visited = visited.set(neighbor, true)
+          queue = queue + [neighbor]
+        }
+      }
+    }
+    return result
+  }
+
+  fn dfs(self, start: Int) -> List<Int> {
+    var visited: List<Bool> = []
+    var i = 0
+    while i < self.nodes.length {
+      visited = visited + [false]
+      i += 1
+    }
+    var stack: List<Int> = [start]
+    var result: List<Int> = []
+    while stack.length > 0 {
+      let current = stack[stack.length - 1]
+      stack = stack.slice(0, stack.length - 1)
+      if !visited[current] {
+        visited = visited.set(current, true)
+        result = result + [current]
+        let neighbors = self.neighbors(current)
+        var j = neighbors.length - 1
+        while j >= 0 {
+          if !visited[neighbors[j]] {
+            stack = stack + [neighbors[j]]
+          }
+          j -= 1
+        }
+      }
+    }
+    return result
+  }
+
+  fn isConnected(self) -> Bool {
+    if self.nodes.length == 0 { return true }
+    let visited = self.bfs(0)
+    return visited.length == self.nodes.length
+  }
+
+  fn hasCycle(self) -> Bool {
+    var visited: List<Bool> = []
+    var i = 0
+    while i < self.nodes.length {
+      visited = visited + [false]
+      i += 1
+    }
+    i = 0
+    while i < self.nodes.length {
+      if !visited[i] {
+        if self._hasCycleDfs(i, -1, visited) { return true }
+      }
+      i += 1
+    }
+    return false
+  }
+
+  fn _hasCycleDfs(self, node: Int, parent: Int, visited: List<Bool>) -> Bool {
+    var vis = visited.set(node, true)
+    for neighbor in self.neighbors(node) {
+      if !vis[neighbor] {
+        if self._hasCycleDfs(neighbor, node, vis) { return true }
+      } else if neighbor != parent {
+        return true
+      }
+    }
+    return false
+  }
+}
+
+// ============================================================
+// DiGraph<T> — Grafo dirigido
+// ============================================================
+
+struct DiGraph<T> {
+  nodes: List<T>
+  edges: List<(Int, Int)>
+
+  fn new() -> DiGraph<T> => DiGraph { nodes: [], edges: [] }
+
+  fn addNode(self, value: T) -> DiGraph<T> {
+    return DiGraph { nodes: self.nodes + [value], edges: self.edges }
+  }
+
+  fn addEdge(self, from: Int, to: Int) -> DiGraph<T> {
+    return DiGraph { nodes: self.nodes, edges: self.edges + [(from, to)] }
+  }
+
+  fn successors(self, node: Int) -> List<Int> {
+    var result: List<Int> = []
+    for edge in self.edges {
+      let {a, b} = edge
+      if a == node { result = result + [b] }
+    }
+    return result
+  }
+
+  fn predecessors(self, node: Int) -> List<Int> {
+    var result: List<Int> = []
+    for edge in self.edges {
+      let {a, b} = edge
+      if b == node { result = result + [a] }
+    }
+    return result
+  }
+
+  fn hasEdge(self, from: Int, to: Int) -> Bool {
+    for edge in self.edges {
+      let {a, b} = edge
+      if a == from && b == to { return true }
+    }
+    return false
+  }
+
+  fn inDegree(self, node: Int) -> Int => self.predecessors(node).length
+  fn outDegree(self, node: Int) -> Int => self.successors(node).length
+
+  fn topologicalSort(self) -> Option<List<Int>> {
+    var inDeg: List<Int> = []
+    var i = 0
+    while i < self.nodes.length {
+      inDeg = inDeg + [0]
+      i += 1
+    }
+    for edge in self.edges {
+      let {a, b} = edge
+      inDeg = inDeg.set(b, inDeg[b] + 1)
+    }
+    var queue: List<Int> = []
+    i = 0
+    while i < self.nodes.length {
+      if inDeg[i] == 0 { queue = queue + [i] }
+      i += 1
+    }
+    var result: List<Int> = []
+    while queue.length > 0 {
+      let current = queue[0]
+      queue = queue.slice(1)
+      result = result + [current]
+      for neighbor in self.successors(current) {
+        inDeg = inDeg.set(neighbor, inDeg[neighbor] - 1)
+        if inDeg[neighbor] == 0 {
+          queue = queue + [neighbor]
+        }
+      }
+    }
+    if result.length != self.nodes.length { return .none }
+    return .some(result)
+  }
+
+  fn hasCycle(self) -> Bool {
+    match self.topologicalSort() {
+      .none => true,
+      .some(_) => false
+    }
+  }
+
+  fn bfs(self, start: Int) -> List<Int> {
+    var visited: List<Bool> = []
+    var i = 0
+    while i < self.nodes.length {
+      visited = visited + [false]
+      i += 1
+    }
+    var queue: List<Int> = [start]
+    visited = visited.set(start, true)
+    var result: List<Int> = []
+    while queue.length > 0 {
+      let current = queue[0]
+      queue = queue.slice(1)
+      result = result + [current]
+      for neighbor in self.successors(current) {
+        if !visited[neighbor] {
+          visited = visited.set(neighbor, true)
+          queue = queue + [neighbor]
+        }
+      }
+    }
+    return result
+  }
+
+  fn dfs(self, start: Int) -> List<Int> {
+    var visited: List<Bool> = []
+    var i = 0
+    while i < self.nodes.length {
+      visited = visited + [false]
+      i += 1
+    }
+    var stack: List<Int> = [start]
+    var result: List<Int> = []
+    while stack.length > 0 {
+      let current = stack[stack.length - 1]
+      stack = stack.slice(0, stack.length - 1)
+      if !visited[current] {
+        visited = visited.set(current, true)
+        result = result + [current]
+        let neighbors = self.successors(current)
+        var j = neighbors.length - 1
+        while j >= 0 {
+          if !visited[neighbors[j]] {
+            stack = stack + [neighbors[j]]
+          }
+          j -= 1
+        }
+      }
+    }
+    return result
+  }
+}
+
+// ============================================================
+// WeightedGraph<T> — Grafo ponderado (não-dirigido)
+// ============================================================
+
+struct WeightedEdge {
+  from: Int
+  to: Int
+  weight: Float
+}
+
+struct WeightedGraph<T> {
+  nodes: List<T>
+  edges: List<WeightedEdge>
+
+  fn new() -> WeightedGraph<T> => WeightedGraph { nodes: [], edges: [] }
+
+  fn addNode(self, value: T) -> WeightedGraph<T> {
+    return WeightedGraph { nodes: self.nodes + [value], edges: self.edges }
+  }
+
+  fn addEdge(self, from: Int, to: Int, weight: Float) -> WeightedGraph<T> {
+    let edge = WeightedEdge { from: from, to: to, weight: weight }
+    return WeightedGraph { nodes: self.nodes, edges: self.edges + [edge] }
+  }
+
+  fn neighbors(self, node: Int) -> List<(Int, Float)> {
+    var result: List<(Int, Float)> = []
+    for edge in self.edges {
+      if edge.from == node { result = result + [(edge.to, edge.weight)] }
+      if edge.to == node { result = result + [(edge.from, edge.weight)] }
+    }
+    return result
+  }
+
+  // Dijkstra — shortest path from source to target
+  fn shortestPath(self, source: Int, target: Int) -> Option<(Float, List<Int>)> {
+    let n = self.nodes.length
+    let inf = 1.0 / 0.0
+
+    // Initialize distances
+    var dist: List<Float> = []
+    var prev: List<Int> = []
+    var visited: List<Bool> = []
+    var i = 0
+    while i < n {
+      dist = dist + [inf]
+      prev = prev + [-1]
+      visited = visited + [false]
+      i += 1
+    }
+    dist = dist.set(source, 0.0)
+
+    // Main loop
+    var remaining = n
+    while remaining > 0 {
+      // Find unvisited node with minimum distance
+      var minDist = inf
+      var u = -1
+      i = 0
+      while i < n {
+        if !visited[i] && dist[i] < minDist {
+          minDist = dist[i]
+          u = i
+        }
+        i += 1
+      }
+      if u == -1 { return .none }
+      if u == target {
+        // Reconstruct path
+        var path: List<Int> = []
+        var current = target
+        while current != -1 {
+          path = [current] + path
+          current = prev[current]
+        }
+        return .some((dist[target], path))
+      }
+      visited = visited.set(u, true)
+      remaining -= 1
+
+      for neighbor in self.neighbors(u) {
+        let {v, w} = neighbor
+        let alt = dist[u] + w
+        if alt < dist[v] {
+          dist = dist.set(v, alt)
+          prev = prev.set(v, u)
+        }
+      }
+    }
+    return .none
+  }
+
+  // Minimum Spanning Tree — Kruskal's algorithm
+  fn mst(self) -> WeightedGraph<T> {
+    let n = self.nodes.length
+    // Sort edges by weight (insertion sort for simplicity)
+    var sorted = self.edges
+    var i = 1
+    while i < sorted.length {
+      let key = sorted[i]
+      var j = i - 1
+      while j >= 0 && sorted[j].weight > key.weight {
+        sorted = sorted.set(j + 1, sorted[j])
+        j -= 1
+      }
+      sorted = sorted.set(j + 1, key)
+      i += 1
+    }
+
+    // Union-Find
+    var parent: List<Int> = []
+    var rank: List<Int> = []
+    i = 0
+    while i < n {
+      parent = parent + [i]
+      rank = rank + [0]
+      i += 1
+    }
+
+    var result = WeightedGraph { nodes: self.nodes, edges: [] }
+
+    for edge in sorted {
+      let rootA = _find(parent, edge.from)
+      let rootB = _find(parent, edge.to)
+      if rootA != rootB {
+        result = WeightedGraph { nodes: result.nodes, edges: result.edges + [edge] }
+        // Union by rank
+        if rank[rootA] < rank[rootB] {
+          parent = parent.set(rootA, rootB)
+        } else if rank[rootA] > rank[rootB] {
+          parent = parent.set(rootB, rootA)
+        } else {
+          parent = parent.set(rootB, rootA)
+          rank = rank.set(rootA, rank[rootA] + 1)
+        }
+      }
+    }
+    return result
+  }
+}
+
+fn _find(parent: List<Int>, node: Int) -> Int {
+  var current = node
+  while parent[current] != current {
+    current = parent[current]
+  }
+  return current
+}
+
+// ============================================================
+// SORTING ALGORITHMS
+// ============================================================
+
+// === Merge Sort — O(n log n), stable ===
+
+fn mergeSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+  if list.length <= 1 { return list }
+  let mid = list.length / 2
+  let left = mergeSort(list.slice(0, mid), compare)
+  let right = mergeSort(list.slice(mid), compare)
+  return _merge(left, right, compare)
+}
+
+fn _merge<T>(left: List<T>, right: List<T>, compare: (T, T) -> Int) -> List<T> {
+  var result: List<T> = []
+  var i = 0
+  var j = 0
+  while i < left.length && j < right.length {
+    if compare(left[i], right[j]) <= 0 {
+      result = result + [left[i]]
+      i += 1
+    } else {
+      result = result + [right[j]]
+      j += 1
+    }
+  }
+  while i < left.length {
+    result = result + [left[i]]
+    i += 1
+  }
+  while j < right.length {
+    result = result + [right[j]]
+    j += 1
+  }
+  return result
+}
+
+// === Quick Sort — O(n log n) average, in-place concept ===
+
+fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+  if list.length <= 1 { return list }
+  let pivot = list[list.length / 2]
+  var less: List<T> = []
+  var equal: List<T> = []
+  var greater: List<T> = []
+  for item in list {
+    let cmp = compare(item, pivot)
+    if cmp < 0 {
+      less = less + [item]
+    } else if cmp == 0 {
+      equal = equal + [item]
+    } else {
+      greater = greater + [item]
+    }
+  }
+  return quickSort(less, compare) + equal + quickSort(greater, compare)
+}
+
+// === Heap Sort — O(n log n), not stable ===
+
+fn heapSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+  var h = list
+  let n = h.length
+
+  // Build max heap
+  var i = n / 2 - 1
+  while i >= 0 {
+    h = _siftDown(h, i, n, compare)
+    i -= 1
+  }
+
+  // Extract elements
+  i = n - 1
+  while i > 0 {
+    let temp = h[0]
+    h = h.set(0, h[i])
+    h = h.set(i, temp)
+    h = _siftDown(h, 0, i, compare)
+    i -= 1
+  }
+  return h
+}
+
+fn _siftDown<T>(heap: List<T>, start: Int, end: Int, compare: (T, T) -> Int) -> List<T> {
+  var h = heap
+  var root = start
+  while 2 * root + 1 < end {
+    let left = 2 * root + 1
+    let right = left + 1
+    var largest = root
+    if compare(h[left], h[largest]) > 0 { largest = left }
+    if right < end && compare(h[right], h[largest]) > 0 { largest = right }
+    if largest == root { return h }
+    let temp = h[root]
+    h = h.set(root, h[largest])
+    h = h.set(largest, temp)
+    root = largest
+  }
+  return h
+}
+
+// === Insertion Sort — O(n²), stable, good for small lists ===
+
+fn insertionSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+  var h = list
+  var i = 1
+  while i < h.length {
+    let key = h[i]
+    var j = i - 1
+    while j >= 0 && compare(h[j], key) > 0 {
+      h = h.set(j + 1, h[j])
+      j -= 1
+    }
+    h = h.set(j + 1, key)
+    i += 1
+  }
+  return h
+}
+
+// === Tim Sort — Hybrid: insertion + merge, O(n log n), stable ===
+
+fn timSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+  let minRun = 32
+  var h = list
+  let n = h.length
+
+  // Sort small runs with insertion sort
+  var i = 0
+  while i < n {
+    let end = min(i + minRun, n)
+    let run = insertionSort(h.slice(i, end), compare)
+    var j = 0
+    while j < run.length {
+      h = h.set(i + j, run[j])
+      j += 1
+    }
+    i += minRun
+  }
+
+  // Merge runs
+  var size = minRun
+  while size < n {
+    i = 0
+    while i < n {
+      let mid = min(i + size, n)
+      let end = min(i + 2 * size, n)
+      if mid < end {
+        let merged = _merge(h.slice(i, mid), h.slice(mid, end), compare)
+        var j = 0
+        while j < merged.length {
+          h = h.set(i + j, merged[j])
+          j += 1
+        }
+      }
+      i += 2 * size
+    }
+    size *= 2
+  }
+  return h
+}
+
+// === Radix Sort — O(nk) for integers ===
+
+fn radixSort(list: List<Int>) -> List<Int> {
+  if list.length <= 1 { return list }
+
+  // Handle negatives: separate, sort positives, reverse negatives
+  var negatives: List<Int> = []
+  var positives: List<Int> = []
+  for item in list {
+    if item < 0 {
+      negatives = negatives + [-item]
+    } else {
+      positives = positives + [item]
+    }
+  }
+
+  positives = _radixSortPositive(positives)
+  negatives = _radixSortPositive(negatives)
+
+  // Reverse negatives and negate
+  var result: List<Int> = []
+  var i = negatives.length - 1
+  while i >= 0 {
+    result = result + [-negatives[i]]
+    i -= 1
+  }
+  return result + positives
+}
+
+fn _radixSortPositive(list: List<Int>) -> List<Int> {
+  if list.length <= 1 { return list }
+
+  // Find max
+  var maxVal = 0
+  for item in list {
+    if item > maxVal { maxVal = item }
+  }
+
+  var h = list
+  var exp = 1
+  while maxVal / exp > 0 {
+    // Counting sort by digit
+    var buckets: List<List<Int>> = []
+    var i = 0
+    while i < 10 {
+      buckets = buckets + [[]]
+      i += 1
+    }
+    for item in h {
+      let digit = (item / exp) % 10
+      buckets = buckets.set(digit, buckets[digit] + [item])
+    }
+    h = []
+    i = 0
+    while i < 10 {
+      h = h + buckets[i]
+      i += 1
+    }
+    exp *= 10
+  }
+  return h
+}
+
+// === Utility ===
+
+fn isSorted<T>(list: List<T>, compare: (T, T) -> Int) -> Bool {
+  if list.length <= 1 { return true }
+  var i = 1
+  while i < list.length {
+    if compare(list[i - 1], list[i]) > 0 { return false }
+    i += 1
+  }
+  return true
+}
+
+fn min(a: Int, b: Int) -> Int => match a { _ if a < b => a, _ => b }
