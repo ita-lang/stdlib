@@ -91,7 +91,7 @@ struct Route {
 
 // === Middleware ===
 
-fn cors(origins: List<String>) -> (Request) -> Result<Request, Response> {
+pub fn cors(origins: List<String>) -> (Request) -> Result<Request, Response> {
   return (req) => {
     let origin = req.headers.get("Origin") ?? "*"
     var allowed = false
@@ -105,11 +105,11 @@ fn cors(origins: List<String>) -> (Request) -> Result<Request, Response> {
   }
 }
 
-fn corsAll() -> (Request) -> Result<Request, Response> {
+pub fn corsAll() -> (Request) -> Result<Request, Response> {
   return (req) => .ok(req)
 }
 
-fn rateLimit(limiter: RateLimiter, now: Int) -> (Request) -> Result<Request, Response> {
+pub fn rateLimit(limiter: RateLimiter, now: Int) -> (Request) -> Result<Request, Response> {
   return (req) => {
     let {allowed, updated} = limiter.check(now)
     if !allowed {
@@ -119,7 +119,7 @@ fn rateLimit(limiter: RateLimiter, now: Int) -> (Request) -> Result<Request, Res
   }
 }
 
-fn requireHeader(name: String) -> (Request) -> Result<Request, Response> {
+pub fn requireHeader(name: String) -> (Request) -> Result<Request, Response> {
   return (req) => {
     match req.headers.get(name) {
       .some(_) => .ok(req),
@@ -128,7 +128,62 @@ fn requireHeader(name: String) -> (Request) -> Result<Request, Response> {
   }
 }
 
-fn requireAuth() -> (Request) -> Result<Request, Response> {
+// Protecao contra brute force por chave (ex: IP, email).
+// Bloqueia apos maxAttempts falhas dentro da janela de tempo do limiter.
+// O caller deve rastrear o estado do limiter entre requests.
+//
+// Uso:
+//   let guard = bruteForceGuard(limiter, now(), "login:" + req.body)
+//   match guard(req) {
+//     .ok(r) => handleLogin(r),
+//     .err(resp) => resp  // 429 Too Many Requests
+//   }
+pub fn bruteForceGuard(limiter: RateLimiter, now: Int, key: String) -> (Request) -> Result<Request, Response> {
+  return (req) => {
+    let {allowed, updated} = limiter.check(now)
+    if !allowed {
+      return .err(Response {
+        status: 429,
+        headers: { "Retry-After": "60" },
+        body: "{\"error\": \"Too many attempts for key: ${key}. Try again later.\"}"
+      })
+    }
+    return .ok(req)
+  }
+}
+
+// Validacao de Content-Type esperado.
+// Rejeita requests que nao enviam o Content-Type correto.
+//
+// Uso:
+//   app.use(requireContentType("application/json"))
+pub fn requireContentType(expected: String) -> (Request) -> Result<Request, Response> {
+  return (req) => {
+    match req.headers.get("Content-Type") {
+      .some(ct) => {
+        if ct == expected || ct.startsWith(expected) {
+          return .ok(req)
+        }
+        return .err(Response.badRequest("Expected Content-Type: ${expected}"))
+      },
+      .none => .err(Response.badRequest("Missing Content-Type header"))
+    }
+  }
+}
+
+// Logging middleware — imprime method, path e tempo de resposta.
+// Deve ser o primeiro middleware da chain para medir tempo total.
+//
+// Uso:
+//   app.use(requestLogger())
+pub fn requestLogger() -> (Request) -> Result<Request, Response> {
+  return (req) => {
+    print("[${req.method}] ${req.path}")
+    return .ok(req)
+  }
+}
+
+pub fn requireAuth() -> (Request) -> Result<Request, Response> {
   return (req) => {
     match req.headers.get("Authorization") {
       .some(auth) => {
@@ -321,7 +376,7 @@ fn _matchRoute(pattern: String, path: String) -> Option<Map<String, String>> {
 
 // === Query Parser ===
 
-fn parseQuery(queryString: String) -> Map<String, String> {
+pub fn parseQuery(queryString: String) -> Map<String, String> {
   var result: Map<String, String> = {}
   if queryString.length == 0 { return result }
   let pairs = queryString.split("&")

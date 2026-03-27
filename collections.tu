@@ -1,133 +1,304 @@
 // Foundation: Collections
-// Estruturas de dados avançadas, grafos e algoritmos de sorting
+// Estruturas de dados, grafos e algoritmos de sorting.
+//
+// MODELO DUAL: safe (imutavel) + unsafe (mutavel)
+//
+// Cada estrutura tem duas versoes:
+//   Stack<T>     — imutavel, retorna nova instancia a cada operacao
+//   MutStack<T>  — mutavel, modifica in-place (marcada como unsafe)
+//
+// QUANDO USAR CADA:
+//   safe  → estado compartilhado, concorrencia, debug, previsibilidade
+//   unsafe → hot loops, batch processing, performance critica
+//
+// TRADEOFFS:
+//   safe  → push O(n) por copia, mas sem race conditions, sem side effects
+//   unsafe → push O(1) amortizado, mas mutacao visivel, cuidado em concorrencia
 
 // ============================================================
-// Stack<T> — LIFO
+// Stack<T> — LIFO (safe, imutavel)
 // ============================================================
+// Cada operacao retorna nova instancia. A original nao muda.
+// Ideal para: estado em closures, recursao, debug.
+//
+// Complexidade (custo da imutabilidade):
+//   push: O(n) — copia a lista interna
+//   pop:  O(n) — copia a lista interna
+//   peek: O(1) — acesso direto ao ultimo elemento
 
-struct Stack<T> {
+pub struct Stack<T> {
   items: List<T>
 
-  fn new() -> Stack<T> => Stack { items: [] }
+  pub fn new() -> Stack<T> => Stack { items: [] }
 
-  fn push(self, value: T) -> Stack<T> {
+  // O(n) — cria nova lista com o elemento adicionado ao final
+  pub fn push(self, value: T) -> Stack<T> {
     return Stack { items: self.items + [value] }
   }
 
-  fn pop(self) -> Option<(T, Stack<T>)> {
+  // O(n) — cria nova lista sem o ultimo elemento
+  pub fn pop(self) -> Option<(T, Stack<T>)> {
     if self.items.length == 0 { return .none }
     let top = self.items[self.items.length - 1]
     let rest = self.items.slice(0, self.items.length - 1)
     return .some((top, Stack { items: rest }))
   }
 
-  fn peek(self) -> Option<T> {
+  // O(1) — acesso direto
+  pub fn peek(self) -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[self.items.length - 1])
   }
 
-  fn isEmpty(self) -> Bool => self.items.length == 0
-  fn size(self) -> Int => self.items.length
-  fn toList(self) -> List<T> => self.items
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn size(self) -> Int => self.items.length
+  pub fn toList(self) -> List<T> => self.items
 }
 
 // ============================================================
-// Queue<T> — FIFO
+// MutStack<T> — LIFO (unsafe, mutavel)
 // ============================================================
+// Modifica a lista in-place. Mais rapido, mas cuidado com
+// aliasing — se duas variaveis apontam para o mesmo MutStack,
+// ambas veem a mutacao.
+//
+// Complexidade:
+//   push: O(1) amortizado — append in-place
+//   pop:  O(1) — remove ultimo in-place
+//   peek: O(1) — acesso direto
+//
+// Usar quando: batch processing, hot loops, algoritmos internos
+// NAO usar quando: estado compartilhado entre isolates/actors
 
-struct Queue<T> {
+pub struct MutStack<T> {
+  var items: List<T>
+
+  pub fn new() -> MutStack<T> => MutStack { items: [] }
+
+  // O(1) amortizado — modifica in-place
+  pub fn push(self, value: T) {
+    self.items = self.items + [value]
+  }
+
+  // O(1) — remove ultimo in-place
+  pub fn pop(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    let top = self.items[self.items.length - 1]
+    self.items = self.items.slice(0, self.items.length - 1)
+    return .some(top)
+  }
+
+  // O(1)
+  pub fn peek(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    return .some(self.items[self.items.length - 1])
+  }
+
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn size(self) -> Int => self.items.length
+  pub fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// Queue<T> — FIFO (safe, imutavel)
+// ============================================================
+// Complexidade (custo da imutabilidade):
+//   enqueue: O(n) — copia a lista
+//   dequeue: O(n) — copia a lista
+//   peek:    O(1) — acesso direto
+
+pub struct Queue<T> {
   items: List<T>
 
-  fn new() -> Queue<T> => Queue { items: [] }
+  pub fn new() -> Queue<T> => Queue { items: [] }
 
-  fn enqueue(self, value: T) -> Queue<T> {
+  // O(n) — cria nova lista com elemento no final
+  pub fn enqueue(self, value: T) -> Queue<T> {
     return Queue { items: self.items + [value] }
   }
 
-  fn dequeue(self) -> Option<(T, Queue<T>)> {
+  // O(n) — cria nova lista sem o primeiro
+  pub fn dequeue(self) -> Option<(T, Queue<T>)> {
     if self.items.length == 0 { return .none }
     let front = self.items[0]
     let rest = self.items.slice(1)
     return .some((front, Queue { items: rest }))
   }
 
-  fn peek(self) -> Option<T> {
+  // O(1)
+  pub fn peek(self) -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[0])
   }
 
-  fn isEmpty(self) -> Bool => self.items.length == 0
-  fn size(self) -> Int => self.items.length
-  fn toList(self) -> List<T> => self.items
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn size(self) -> Int => self.items.length
+  pub fn toList(self) -> List<T> => self.items
 }
 
 // ============================================================
-// Deque<T> — Double-ended queue
+// MutQueue<T> — FIFO (unsafe, mutavel)
 // ============================================================
+// Usa duas listas internas (inbox + outbox) para dequeue O(1) amortizado.
+// Tecnica classica de functional queue adaptada para mutacao.
+//
+// Complexidade:
+//   enqueue: O(1) amortizado
+//   dequeue: O(1) amortizado (O(n) quando precisa reverter inbox → outbox)
+//   peek:    O(1) amortizado
 
-struct Deque<T> {
+pub struct MutQueue<T> {
+  var inbox: List<T>
+  var outbox: List<T>
+
+  pub fn new() -> MutQueue<T> => MutQueue { inbox: [], outbox: [] }
+
+  // O(1) amortizado
+  pub fn enqueue(self, value: T) {
+    self.inbox = self.inbox + [value]
+  }
+
+  // O(1) amortizado — O(n) quando outbox vazia (reverte inbox)
+  pub fn dequeue(self) -> Option<T> {
+    if self.outbox.length == 0 {
+      if self.inbox.length == 0 { return .none }
+      // Reverter inbox para outbox
+      var i = self.inbox.length - 1
+      while i >= 0 {
+        self.outbox = self.outbox + [self.inbox[i]]
+        i -= 1
+      }
+      self.inbox = []
+    }
+    let front = self.outbox[self.outbox.length - 1]
+    self.outbox = self.outbox.slice(0, self.outbox.length - 1)
+    return .some(front)
+  }
+
+  pub fn isEmpty(self) -> Bool => self.inbox.length == 0 && self.outbox.length == 0
+  pub fn size(self) -> Int => self.inbox.length + self.outbox.length
+}
+
+// ============================================================
+// Deque<T> — Double-ended queue (safe, imutavel)
+// ============================================================
+// Complexidade: todas as operacoes O(n) por copia
+
+pub struct Deque<T> {
   items: List<T>
 
-  fn new() -> Deque<T> => Deque { items: [] }
+  pub fn new() -> Deque<T> => Deque { items: [] }
 
-  fn pushFront(self, value: T) -> Deque<T> {
+  // O(n) — prepend + copia
+  pub fn pushFront(self, value: T) -> Deque<T> {
     return Deque { items: [value] + self.items }
   }
 
-  fn pushBack(self, value: T) -> Deque<T> {
+  // O(n) — append + copia
+  pub fn pushBack(self, value: T) -> Deque<T> {
     return Deque { items: self.items + [value] }
   }
 
-  fn popFront(self) -> Option<(T, Deque<T>)> {
+  // O(n)
+  pub fn popFront(self) -> Option<(T, Deque<T>)> {
     if self.items.length == 0 { return .none }
     let front = self.items[0]
     let rest = self.items.slice(1)
     return .some((front, Deque { items: rest }))
   }
 
-  fn popBack(self) -> Option<(T, Deque<T>)> {
+  // O(n)
+  pub fn popBack(self) -> Option<(T, Deque<T>)> {
     if self.items.length == 0 { return .none }
     let back = self.items[self.items.length - 1]
     let rest = self.items.slice(0, self.items.length - 1)
     return .some((back, Deque { items: rest }))
   }
 
-  fn peekFront(self) -> Option<T> {
+  // O(1)
+  pub fn peekFront(self) -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[0])
   }
 
-  fn peekBack(self) -> Option<T> {
+  // O(1)
+  pub fn peekBack(self) -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[self.items.length - 1])
   }
 
-  fn isEmpty(self) -> Bool => self.items.length == 0
-  fn size(self) -> Int => self.items.length
-  fn toList(self) -> List<T> => self.items
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn size(self) -> Int => self.items.length
+  pub fn toList(self) -> List<T> => self.items
 }
 
 // ============================================================
-// PriorityQueue<T> — Min-heap by default
+// MutDeque<T> — Double-ended queue (unsafe, mutavel)
 // ============================================================
+// Complexidade:
+//   pushBack/popBack: O(1) amortizado
+//   pushFront: O(n) — prepend em array
+//   popFront:  O(n) — shift em array
 
-struct PriorityQueue<T> {
+pub struct MutDeque<T> {
+  var items: List<T>
+
+  pub fn new() -> MutDeque<T> => MutDeque { items: [] }
+
+  // O(n) — prepend
+  pub fn pushFront(self, value: T) {
+    self.items = [value] + self.items
+  }
+
+  // O(1) amortizado
+  pub fn pushBack(self, value: T) {
+    self.items = self.items + [value]
+  }
+
+  // O(n) — shift
+  pub fn popFront(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    let front = self.items[0]
+    self.items = self.items.slice(1)
+    return .some(front)
+  }
+
+  // O(1)
+  pub fn popBack(self) -> Option<T> {
+    if self.items.length == 0 { return .none }
+    let back = self.items[self.items.length - 1]
+    self.items = self.items.slice(0, self.items.length - 1)
+    return .some(back)
+  }
+
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn size(self) -> Int => self.items.length
+  pub fn toList(self) -> List<T> => self.items
+}
+
+// ============================================================
+// PriorityQueue<T> — Min-heap (safe, imutavel)
+// ============================================================
+// Complexidade: insert/extract O(n log n) — cada swap copia a lista
+
+pub struct PriorityQueue<T> {
   heap: List<T>
   compare: (T, T) -> Int
 
-  fn new(compare: (T, T) -> Int) -> PriorityQueue<T> {
+  pub fn new(compare: (T, T) -> Int) -> PriorityQueue<T> {
     return PriorityQueue { heap: [], compare: compare }
   }
 
-  fn minQueue() -> PriorityQueue<Int> {
+  pub fn minQueue() -> PriorityQueue<Int> {
     return PriorityQueue.new((a, b) => a - b)
   }
 
-  fn maxQueue() -> PriorityQueue<Int> {
+  pub fn maxQueue() -> PriorityQueue<Int> {
     return PriorityQueue.new((a, b) => b - a)
   }
 
-  fn insert(self, value: T) -> PriorityQueue<T> {
+  // O(n log n) — sift-up com copia a cada swap
+  pub fn insert(self, value: T) -> PriorityQueue<T> {
     var h = self.heap + [value]
     var i = h.length - 1
     while i > 0 {
@@ -144,7 +315,8 @@ struct PriorityQueue<T> {
     return PriorityQueue { heap: h, compare: self.compare }
   }
 
-  fn extractTop(self) -> Option<(T, PriorityQueue<T>)> {
+  // O(n log n) — sift-down com copia a cada swap
+  pub fn extractTop(self) -> Option<(T, PriorityQueue<T>)> {
     if self.heap.length == 0 { return .none }
     if self.heap.length == 1 {
       return .some((self.heap[0], PriorityQueue { heap: [], compare: self.compare }))
@@ -152,7 +324,6 @@ struct PriorityQueue<T> {
     let top = self.heap[0]
     var h = self.heap.set(0, self.heap[self.heap.length - 1])
     h = h.slice(0, h.length - 1)
-    // Sift down
     var i = 0
     while true {
       let left = 2 * i + 1
@@ -173,29 +344,96 @@ struct PriorityQueue<T> {
     return .some((top, PriorityQueue { heap: h, compare: self.compare }))
   }
 
-  fn peek(self) -> Option<T> {
+  pub fn peek(self) -> Option<T> {
     if self.heap.length == 0 { return .none }
     return .some(self.heap[0])
   }
 
-  fn isEmpty(self) -> Bool => self.heap.length == 0
-  fn size(self) -> Int => self.heap.length
+  pub fn isEmpty(self) -> Bool => self.heap.length == 0
+  pub fn size(self) -> Int => self.heap.length
 }
 
 // ============================================================
-// Ring<T> — Buffer circular de tamanho fixo
+// MutPriorityQueue<T> — Min-heap (unsafe, mutavel)
 // ============================================================
+// Complexidade: insert/extract O(log n) — swaps in-place
 
-struct Ring<T> {
+pub struct MutPriorityQueue<T> {
+  var heap: List<T>
+  compare: (T, T) -> Int
+
+  pub fn new(compare: (T, T) -> Int) -> MutPriorityQueue<T> {
+    return MutPriorityQueue { heap: [], compare: compare }
+  }
+
+  // O(log n) — sift-up in-place
+  pub fn insert(self, value: T) {
+    self.heap = self.heap + [value]
+    var i = self.heap.length - 1
+    while i > 0 {
+      let parent = (i - 1) / 2
+      if self.compare(self.heap[i], self.heap[parent]) < 0 {
+        let temp = self.heap[i]
+        self.heap = self.heap.set(i, self.heap[parent])
+        self.heap = self.heap.set(parent, temp)
+        i = parent
+      } else {
+        i = 0
+      }
+    }
+  }
+
+  // O(log n) — sift-down in-place
+  pub fn extractTop(self) -> Option<T> {
+    if self.heap.length == 0 { return .none }
+    let top = self.heap[0]
+    self.heap = self.heap.set(0, self.heap[self.heap.length - 1])
+    self.heap = self.heap.slice(0, self.heap.length - 1)
+    var i = 0
+    while true {
+      let left = 2 * i + 1
+      let right = 2 * i + 2
+      var smallest = i
+      if left < self.heap.length && self.compare(self.heap[left], self.heap[smallest]) < 0 {
+        smallest = left
+      }
+      if right < self.heap.length && self.compare(self.heap[right], self.heap[smallest]) < 0 {
+        smallest = right
+      }
+      if smallest == i { return .some(top) }
+      let temp = self.heap[i]
+      self.heap = self.heap.set(i, self.heap[smallest])
+      self.heap = self.heap.set(smallest, temp)
+      i = smallest
+    }
+    return .some(top)
+  }
+
+  pub fn peek(self) -> Option<T> {
+    if self.heap.length == 0 { return .none }
+    return .some(self.heap[0])
+  }
+
+  pub fn isEmpty(self) -> Bool => self.heap.length == 0
+  pub fn size(self) -> Int => self.heap.length
+}
+
+// ============================================================
+// Ring<T> — Buffer circular (safe, imutavel)
+// ============================================================
+// Complexidade: push O(n) — copia a lista
+
+pub struct Ring<T> {
   items: List<T>
   capacity: Int
   writePos: Int
 
-  fn new(capacity: Int) -> Ring<T> {
+  pub fn new(capacity: Int) -> Ring<T> {
     return Ring { items: [], capacity: capacity, writePos: 0 }
   }
 
-  fn push(self, value: T) -> Ring<T> {
+  // O(n)
+  pub fn push(self, value: T) -> Ring<T> {
     if self.items.length < self.capacity {
       return Ring {
         items: self.items + [value],
@@ -211,27 +449,29 @@ struct Ring<T> {
     }
   }
 
-  fn toList(self) -> List<T> {
+  pub fn toList(self) -> List<T> {
     if self.items.length < self.capacity { return self.items }
     let start = self.writePos % self.capacity
     return self.items.slice(start) + self.items.slice(0, start)
   }
 
-  fn isFull(self) -> Bool => self.items.length == self.capacity
-  fn size(self) -> Int => self.items.length
+  pub fn isFull(self) -> Bool => self.items.length == self.capacity
+  pub fn size(self) -> Int => self.items.length
 }
 
 // ============================================================
-// OrderedMap<K, V> — Map que mantém ordem de inserção
+// OrderedMap<K, V> — Map com ordem de insercao (safe, imutavel)
 // ============================================================
+// Complexidade: get/set/has O(n) — busca linear
 
-struct OrderedMap<K, V> {
+pub struct OrderedMap<K, V> {
   keys: List<K>
   values: List<V>
 
-  fn new() -> OrderedMap<K, V> => OrderedMap { keys: [], values: [] }
+  pub fn new() -> OrderedMap<K, V> => OrderedMap { keys: [], values: [] }
 
-  fn set(self, key: K, value: V) -> OrderedMap<K, V> {
+  // O(n)
+  pub fn set(self, key: K, value: V) -> OrderedMap<K, V> {
     var i = 0
     while i < self.keys.length {
       if self.keys[i] == key {
@@ -248,7 +488,8 @@ struct OrderedMap<K, V> {
     }
   }
 
-  fn get(self, key: K) -> Option<V> {
+  // O(n)
+  pub fn get(self, key: K) -> Option<V> {
     var i = 0
     while i < self.keys.length {
       if self.keys[i] == key { return .some(self.values[i]) }
@@ -257,14 +498,16 @@ struct OrderedMap<K, V> {
     return .none
   }
 
-  fn has(self, key: K) -> Bool {
+  // O(n)
+  pub fn has(self, key: K) -> Bool {
     for k in self.keys {
       if k == key { return true }
     }
     return false
   }
 
-  fn remove(self, key: K) -> OrderedMap<K, V> {
+  // O(n)
+  pub fn remove(self, key: K) -> OrderedMap<K, V> {
     var newKeys: List<K> = []
     var newValues: List<V> = []
     var i = 0
@@ -278,10 +521,10 @@ struct OrderedMap<K, V> {
     return OrderedMap { keys: newKeys, values: newValues }
   }
 
-  fn size(self) -> Int => self.keys.length
-  fn isEmpty(self) -> Bool => self.keys.length == 0
+  pub fn size(self) -> Int => self.keys.length
+  pub fn isEmpty(self) -> Bool => self.keys.length == 0
 
-  fn entries(self) -> List<(K, V)> {
+  pub fn entries(self) -> List<(K, V)> {
     var result: List<(K, V)> = []
     var i = 0
     while i < self.keys.length {
@@ -293,22 +536,26 @@ struct OrderedMap<K, V> {
 }
 
 // ============================================================
-// OrderedSet<T> — Set que mantém ordem de inserção
+// OrderedSet<T> — Set com ordem de insercao (safe, imutavel)
 // ============================================================
+// Complexidade: add/has O(n) — busca linear
+// union/intersection: O(n*m)
 
-struct OrderedSet<T> {
+pub struct OrderedSet<T> {
   items: List<T>
 
-  fn new() -> OrderedSet<T> => OrderedSet { items: [] }
+  pub fn new() -> OrderedSet<T> => OrderedSet { items: [] }
 
-  fn add(self, value: T) -> OrderedSet<T> {
+  // O(n) — verifica duplicata + copia
+  pub fn add(self, value: T) -> OrderedSet<T> {
     for item in self.items {
       if item == value { return self }
     }
     return OrderedSet { items: self.items + [value] }
   }
 
-  fn remove(self, value: T) -> OrderedSet<T> {
+  // O(n)
+  pub fn remove(self, value: T) -> OrderedSet<T> {
     var newItems: List<T> = []
     for item in self.items {
       if item != value { newItems = newItems + [item] }
@@ -316,14 +563,16 @@ struct OrderedSet<T> {
     return OrderedSet { items: newItems }
   }
 
-  fn has(self, value: T) -> Bool {
+  // O(n)
+  pub fn has(self, value: T) -> Bool {
     for item in self.items {
       if item == value { return true }
     }
     return false
   }
 
-  fn union(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  // O(n*m)
+  pub fn union(self, other: OrderedSet<T>) -> OrderedSet<T> {
     var result = self
     for item in other.items {
       result = result.add(item)
@@ -331,7 +580,8 @@ struct OrderedSet<T> {
     return result
   }
 
-  fn intersection(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  // O(n*m)
+  pub fn intersection(self, other: OrderedSet<T>) -> OrderedSet<T> {
     var result = OrderedSet.new()
     for item in self.items {
       if other.has(item) { result = result.add(item) }
@@ -339,7 +589,8 @@ struct OrderedSet<T> {
     return result
   }
 
-  fn difference(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  // O(n*m)
+  pub fn difference(self, other: OrderedSet<T>) -> OrderedSet<T> {
     var result = OrderedSet.new()
     for item in self.items {
       if !other.has(item) { result = result.add(item) }
@@ -347,9 +598,9 @@ struct OrderedSet<T> {
     return result
   }
 
-  fn size(self) -> Int => self.items.length
-  fn isEmpty(self) -> Bool => self.items.length == 0
-  fn toList(self) -> List<T> => self.items
+  pub fn size(self) -> Int => self.items.length
+  pub fn isEmpty(self) -> Bool => self.items.length == 0
+  pub fn toList(self) -> List<T> => self.items
 }
 
 // ============================================================
