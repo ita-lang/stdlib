@@ -95,16 +95,16 @@ struct Config {
   fn keys(self) -> List<String> => self.data.keys()
 }
 
-// === App Config — loads from glu.toml + env overrides ===
+// === App Config — loads from config.toml + env overrides ===
 
 fn loadAppConfig() -> Result<Config, String> {
-  let base = Config.load("glu.toml")
+  let base = Config.load("config.toml")
   match base {
     .ok(config) => {
-      // Env vars override TOML values (GLU_ prefix)
+      // Env vars override TOML values (ITA_ prefix)
       var result = config
       for key in config.keys() {
-        let envKey = "GLU_" + key.toUpperCase().replaceAll(".", "_")
+        let envKey = "ITA_" + key.toUpperCase().replaceAll(".", "_")
         match Env.get(envKey) {
           .some(v) => result = result.set(key, v),
           .none => {}

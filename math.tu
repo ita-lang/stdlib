@@ -1,5 +1,5 @@
 // Foundation: Math
-// Funções matemáticas puras para Glu
+// Funções matemáticas puras para Itá
 
 // === Constants ===
 

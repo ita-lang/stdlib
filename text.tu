@@ -1,5 +1,5 @@
 // Foundation: Text
-// Utilitários de string para Glu
+// Utilitários de string para Itá
 
 // === Case Conversion ===
 

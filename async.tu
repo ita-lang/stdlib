@@ -2,10 +2,9 @@
 // Patterns de concorrência compostos sobre async/await nativo
 
 // === Retry ===
-
 async fn retry<T>(times: Int, delayMs: Int, fn: () -> Result<T, String>) -> Result<T, String> {
   var attempt = 0
-  var lastError = ""
+  var lastError:String = ""
   while attempt < times {
     match fn() {
       .ok(value) => return .ok(value),
@@ -46,11 +45,11 @@ async fn retryWithBackoff<T>(times: Int, baseDelayMs: Int, fn: () -> Result<T, S
 async fn timeout<T>(ms: Int, fn: async () -> T) -> Result<T, String> {
   // Race between the function and a timer
   let result = await race(
-    async () => .ok(await fn()),
-    async () => {
-      await Timer.delay(ms)
-      return .err("Timeout after ${ms}ms")
-    }
+  async () => .ok(await fn()),
+  async () => {
+    await Timer.delay(ms)
+    return .err("Timeout after ${ms}ms")
+  }
   )
   return result
 }
