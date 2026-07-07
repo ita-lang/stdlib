@@ -53,10 +53,10 @@ fn flatten<T>(list: List<List<T>>) -> List<T> {
   return result
 }
 
-fn flatMap<T, U>(list: List<T>, fn: (T) -> List<U>) -> List<U> {
+fn flatMap<T, U>(list: List<T>, f: (T) -> List<U>) -> List<U> {
   var result: List<U> = []
   for item in list {
-    result = result + fn(item)
+    result = result + f(item)
   }
   return result
 }
@@ -155,11 +155,11 @@ fn partition<T>(list: List<T>, predicate: (T) -> Bool) -> (List<T>, List<T>) {
 
 // === Aggregation ===
 
-fn scan<T, U>(list: List<T>, initial: U, fn: (U, T) -> U) -> List<U> {
+fn scan<T, U>(list: List<T>, initial: U, f: (U, T) -> U) -> List<U> {
   var result: List<U> = [initial]
   var acc = initial
   for item in list {
-    acc = fn(acc, item)
+    acc = f(acc, item)
     result = result + [acc]
   }
   return result

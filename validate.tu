@@ -3,116 +3,112 @@
 
 enum SchemaRule {
   required,
-  minLen(Int),
-  maxLen(Int),
-  minVal(Int),
-  maxVal(Int),
-  pattern(String),
+  minLen(value: Int),
+  maxLen(value: Int),
+  minVal(value: Int),
+  maxVal(value: Int),
+  pattern(value: String),
   email,
   url,
-  oneOf(List<String>),
-  custom((String) -> Bool, String)
+  oneOf(values: List<String>),
+  custom(pred: (String) -> Bool, msg: String)
 }
 
 struct Schema {
   rules: List<SchemaRule>
+}
 
-  fn string() -> Schema => Schema { rules: [.required] }
-  fn int() -> Schema => Schema { rules: [.required] }
-  fn optional() -> Schema => Schema { rules: [] }
+extension Schema {
+  static fn string() -> Schema => Schema(rules: [.required])
+  static fn int() -> Schema => Schema(rules: [.required])
+  static fn optional() -> Schema => Schema(rules: [])
 
-  fn required(self) -> Schema {
-    return Schema { rules: self.rules + [.required] }
+  fn required() -> Schema {
+    return Schema(rules: self.rules + [.required])
   }
 
-  fn min(self, n: Int) -> Schema {
-    return Schema { rules: self.rules + [.minLen(n)] }
+  fn min(n: Int) -> Schema {
+    return Schema(rules: self.rules + [.minLen(n)])
   }
 
-  fn max(self, n: Int) -> Schema {
-    return Schema { rules: self.rules + [.maxLen(n)] }
+  fn max(n: Int) -> Schema {
+    return Schema(rules: self.rules + [.maxLen(n)])
   }
 
-  fn minVal(self, n: Int) -> Schema {
-    return Schema { rules: self.rules + [.minVal(n)] }
+  fn minVal(n: Int) -> Schema {
+    return Schema(rules: self.rules + [.minVal(n)])
   }
 
-  fn maxVal(self, n: Int) -> Schema {
-    return Schema { rules: self.rules + [.maxVal(n)] }
+  fn maxVal(n: Int) -> Schema {
+    return Schema(rules: self.rules + [.maxVal(n)])
   }
 
-  fn email(self) -> Schema {
-    return Schema { rules: self.rules + [.email] }
+  fn email() -> Schema {
+    return Schema(rules: self.rules + [.email])
   }
 
-  fn url(self) -> Schema {
-    return Schema { rules: self.rules + [.url] }
+  fn url() -> Schema {
+    return Schema(rules: self.rules + [.url])
   }
 
-  fn oneOf(self, values: List<String>) -> Schema {
-    return Schema { rules: self.rules + [.oneOf(values)] }
+  fn oneOf(values: List<String>) -> Schema {
+    return Schema(rules: self.rules + [.oneOf(values)])
   }
 
-  fn matches(self, pattern: String) -> Schema {
-    return Schema { rules: self.rules + [.pattern(pattern)] }
+  fn matches(pattern: String) -> Schema {
+    return Schema(rules: self.rules + [.pattern(pattern)])
   }
 
-  fn check(self, pred: (String) -> Bool, msg: String) -> Schema {
-    return Schema { rules: self.rules + [.custom(pred, msg)] }
+  fn check(pred: (String) -> Bool, msg: String) -> Schema {
+    return Schema(rules: self.rules + [.custom(pred, msg)])
   }
 
-  fn validate(self, value: String) -> Result<String, List<String>> {
+  fn validate(value: String) -> Result<String, List<String>> {
     var errors: List<String> = []
 
     for rule in self.rules {
-      match rule {
-        .required => {
-          if value.length == 0 { errors = errors + ["field is required"] }
-        },
-        .minLen(n) => {
-          if value.length < n { errors = errors + ["must be at least ${n} characters"] }
-        },
-        .maxLen(n) => {
-          if value.length > n { errors = errors + ["must be at most ${n} characters"] }
-        },
-        .minVal(n) => {
-          // Assume numeric string
-          if value.toInt() < n { errors = errors + ["must be at least ${n}"] }
-        },
-        .maxVal(n) => {
-          if value.toInt() > n { errors = errors + ["must be at most ${n}"] }
-        },
-        .email => {
-          let parts = value.split("@")
-          if parts.length != 2 || parts[1].indexOf(".") < 0 {
-            errors = errors + ["must be a valid email"]
-          }
-        },
-        .url => {
-          if !value.startsWith("http://") && !value.startsWith("https://") {
-            errors = errors + ["must be a valid URL"]
-          }
-        },
-        .oneOf(values) => {
-          var found = false
-          for v in values {
-            if v == value { found = true }
-          }
-          if !found { errors = errors + ["must be one of: ${values.join(", ")}"] }
-        },
-        .pattern(p) => {
-          // Basic pattern check — delegates to runtime
-          if !value.matches(p) { errors = errors + ["must match pattern ${p}"] }
-        },
-        .custom(pred, msg) => {
-          if !pred(value) { errors = errors + [msg] }
-        }
-      }
+      errors = errors + _ruleErrors(rule, value)
     }
 
     if errors.length > 0 { return .err(errors) }
     return .ok(value)
   }
+}
+
+// === Rule evaluation ===
+
+fn _ruleErrors(rule: SchemaRule, value: String) -> List<String> {
+  match rule {
+    .required => if value.length == 0 { ["field is required"] } else { [] },
+    .minLen(n) => if value.length < n { ["must be at least ${n} characters"] } else { [] },
+    .maxLen(n) => if value.length > n { ["must be at most ${n} characters"] } else { [] },
+    // Assume numeric string
+    .minVal(n) => if value.toInt() < n { ["must be at least ${n}"] } else { [] },
+    .maxVal(n) => if value.toInt() > n { ["must be at most ${n}"] } else { [] },
+    .email => _checkEmail(value),
+    .url => if !value.startsWith("http://") && !value.startsWith("https://") { ["must be a valid URL"] } else { [] },
+    .oneOf(values) => _checkOneOf(value, values),
+    // Basic pattern check — delegates to runtime
+    .pattern(p) => if !value.matches(p) { ["must match pattern ${p}"] } else { [] },
+    .custom(pred, msg) => if !pred(value) { [msg] } else { [] }
+  }
+}
+
+fn _checkEmail(value: String) -> List<String> {
+  let parts = value.split("@")
+  if parts.length != 2 || parts[1].indexOf(".") < 0 {
+    return ["must be a valid email"]
+  }
+  return []
+}
+
+fn _checkOneOf(value: String, values: List<String>) -> List<String> {
+  var found = false
+  for v in values {
+    if v == value { found = true }
+  }
+  if !found { return ["must be one of: ${values.join(", ")}"] }
+  return []
 }
 
 // === Object Schema ===
@@ -124,29 +120,36 @@ struct FieldSchema {
 
 struct ObjectSchema {
   fields: List<FieldSchema>
+}
 
-  fn new() -> ObjectSchema => ObjectSchema { fields: [] }
+extension ObjectSchema {
+  static fn new() -> ObjectSchema => ObjectSchema(fields: [])
 
-  fn field(self, name: String, schema: Schema) -> ObjectSchema {
-    return ObjectSchema { fields: self.fields + [FieldSchema { name: name, schema: schema }] }
+  fn field(name: String, schema: Schema) -> ObjectSchema {
+    return ObjectSchema(fields: self.fields + [FieldSchema(name: name, schema: schema)])
   }
 
-  fn validate(self, data: Map<String, String>) -> Result<Map<String, String>, List<String>> {
+  fn validate(data: Map<String, String>) -> Result<Map<String, String>, List<String>> {
     var allErrors: List<String> = []
 
     for f in self.fields {
       let value = data.get(f.name) ?? ""
-      match f.schema.validate(value) {
-        .ok(_) => {},
-        .err(errors) => {
-          for e in errors {
-            allErrors = allErrors + ["${f.name}: ${e}"]
-          }
-        }
+      let fieldErrors = match f.schema.validate(value) {
+        .ok(_) => [],
+        .err(errors) => _prefixErrors(f.name, errors)
       }
+      allErrors = allErrors + fieldErrors
     }
 
     if allErrors.length > 0 { return .err(allErrors) }
     return .ok(data)
   }
+}
+
+fn _prefixErrors(name: String, errors: List<String>) -> List<String> {
+  var result: List<String> = []
+  for e in errors {
+    result = result + ["${name}: ${e}"]
+  }
+  return result
 }
