@@ -1,0 +1,19 @@
+
+chunk = [[1, 2], [3, 4], [5]]
+window = [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+zip = [(1, a), (2, b), (3, c)]
+enumerate = [(0, a), (1, b)]
+flatten = [1, 2, 3, 4, 5]
+flatMap = [1, 10, 2, 20, 3, 30]
+distinct = [1, 2, 3]
+partition = ([2, 4], [1, 3, 5])
+groupBy = [(1, [1, 3, 5]), (0, [2, 4])]
+scan = [0, 1, 3, 6, 10, 15]
+take = [1, 2]
+skip = [3, 4, 5]
+takeWhile = [1, 2]
+skipWhile = [3, 4, 5]
+sortBy = [1, 2, 3]
+any = true
+all = true
+count = 2

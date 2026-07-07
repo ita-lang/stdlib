@@ -1,0 +1,16 @@
+
+format = 2024-02-29
+isLeapYear(2024) = true
+isLeapYear(2023) = false
+addDays = 2024-03-01
+dayOfWeek = 4
+dayOfYear = 60
+toIso = 2024-02-29T00:00:00
+diffInDays = 10
+diffInHours = 240
+isBefore = true
+isAfter = false
+startOfMonth = 2024-02-01
+endOfMonth = 2024-02-29
+startOfYear = 2024-01-01
+endOfYear = 2024-12-31

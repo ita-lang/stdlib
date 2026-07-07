@@ -1,0 +1,25 @@
+
+camelCase = helloWorldFoo
+snakeCase = hello_world
+pascalCase = HelloWorld
+kebabCase = hello-world
+slugify = hello-world
+capitalize = ItaLang
+trim = 'hi'
+padStart = 005
+padEnd = 500
+repeat = ababab
+reverse = cba
+toLower = abc
+toUpper = ABC
+isEmail(ok) = true
+isEmail(bad) = false
+isUrl = true
+isNumeric(123) = true
+isNumeric(12a) = false
+isAlpha(abc) = true
+contains = true
+countOccurrences = 3
+startsWith = true
+endsWith = true
+template = Hello World

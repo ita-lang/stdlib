@@ -1,0 +1,9 @@
+
+short err: [must be at least 3 characters]
+valid ok: hello
+long err: [must be at most 10 characters]
+email ok ok: a@b.com
+email bad err: [must be a valid email]
+url ok ok: https://x.com
+url bad err: [must be a valid URL]
+empty err: [field is required]
