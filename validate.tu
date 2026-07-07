@@ -82,9 +82,10 @@ fn _ruleErrors(rule: SchemaRule, value: String) -> List<String> {
     .required => if value.length == 0 { ["field is required"] } else { [] },
     .minLen(n) => if value.length < n { ["must be at least ${n} characters"] } else { [] },
     .maxLen(n) => if value.length > n { ["must be at most ${n} characters"] } else { [] },
-    // Assume numeric string
-    .minVal(n) => if value.toInt() < n { ["must be at least ${n}"] } else { [] },
-    .maxVal(n) => if value.toInt() > n { ["must be at most ${n}"] } else { [] },
+    // Assume numeric string. toInt() -> Int? (null se não-parseável); default 0
+    // via ?? antes de comparar (?? tem precedência menor que <, então parênteses).
+    .minVal(n) => if (value.toInt() ?? 0) < n { ["must be at least ${n}"] } else { [] },
+    .maxVal(n) => if (value.toInt() ?? 0) > n { ["must be at most ${n}"] } else { [] },
     .email => _checkEmail(value),
     .url => if !value.startsWith("http://") && !value.startsWith("https://") { ["must be a valid URL"] } else { [] },
     .oneOf(values) => _checkOneOf(value, values),

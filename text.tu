@@ -3,7 +3,7 @@
 
 // === Case Conversion ===
 
-fn camelCase(s: String) -> String {
+pub fn camelCase(s: String) -> String {
   let words = splitWords(s)
   if words.length == 0 { return "" }
   var result = toLower(words[0])
@@ -15,7 +15,7 @@ fn camelCase(s: String) -> String {
   return result
 }
 
-fn pascalCase(s: String) -> String {
+pub fn pascalCase(s: String) -> String {
   let words = splitWords(s)
   var result = ""
   for word in words {
@@ -24,7 +24,7 @@ fn pascalCase(s: String) -> String {
   return result
 }
 
-fn snakeCase(s: String) -> String {
+pub fn snakeCase(s: String) -> String {
   let words = splitWords(s)
   var result = ""
   var i = 0
@@ -36,7 +36,7 @@ fn snakeCase(s: String) -> String {
   return result
 }
 
-fn kebabCase(s: String) -> String {
+pub fn kebabCase(s: String) -> String {
   let words = splitWords(s)
   var result = ""
   var i = 0
@@ -48,7 +48,7 @@ fn kebabCase(s: String) -> String {
   return result
 }
 
-fn screamingSnakeCase(s: String) -> String {
+pub fn screamingSnakeCase(s: String) -> String {
   let words = splitWords(s)
   var result = ""
   var i = 0
@@ -62,12 +62,12 @@ fn screamingSnakeCase(s: String) -> String {
 
 // === String Helpers ===
 
-fn capitalize(s: String) -> String {
+pub fn capitalize(s: String) -> String {
   if s.length == 0 { return s }
   return toUpper(s[0]) + s.substring(1)
 }
 
-fn toLower(s: String) -> String {
+pub fn toLower(s: String) -> String {
   var result = ""
   for ch in s {
     let code = ch.codeUnit
@@ -80,7 +80,7 @@ fn toLower(s: String) -> String {
   return result
 }
 
-fn toUpper(s: String) -> String {
+pub fn toUpper(s: String) -> String {
   var result = ""
   for ch in s {
     let code = ch.codeUnit
@@ -95,7 +95,7 @@ fn toUpper(s: String) -> String {
 
 // === Padding & Trimming ===
 
-fn padStart(s: String, length: Int, fill: String) -> String {
+pub fn padStart(s: String, length: Int, fill: String) -> String {
   if s.length >= length { return s }
   var pad = ""
   while pad.length + s.length < length {
@@ -104,7 +104,7 @@ fn padStart(s: String, length: Int, fill: String) -> String {
   return pad.substring(0, length - s.length) + s
 }
 
-fn padEnd(s: String, length: Int, fill: String) -> String {
+pub fn padEnd(s: String, length: Int, fill: String) -> String {
   if s.length >= length { return s }
   var pad = ""
   while s.length + pad.length < length {
@@ -113,7 +113,7 @@ fn padEnd(s: String, length: Int, fill: String) -> String {
   return s + pad.substring(0, length - s.length)
 }
 
-fn trim(s: String) -> String {
+pub fn trim(s: String) -> String {
   var start = 0
   var end = s.length - 1
   while start <= end && isWhitespace(s[start]) {
@@ -125,7 +125,7 @@ fn trim(s: String) -> String {
   return s.substring(start, end + 1)
 }
 
-fn trimStart(s: String) -> String {
+pub fn trimStart(s: String) -> String {
   var start = 0
   while start < s.length && isWhitespace(s[start]) {
     start += 1
@@ -133,7 +133,7 @@ fn trimStart(s: String) -> String {
   return s.substring(start)
 }
 
-fn trimEnd(s: String) -> String {
+pub fn trimEnd(s: String) -> String {
   var end = s.length - 1
   while end >= 0 && isWhitespace(s[end]) {
     end -= 1
@@ -143,7 +143,7 @@ fn trimEnd(s: String) -> String {
 
 // === Manipulation ===
 
-fn repeat(s: String, times: Int) -> String {
+pub fn repeat(s: String, times: Int) -> String {
   var result = ""
   var i = 0
   while i < times {
@@ -153,7 +153,7 @@ fn repeat(s: String, times: Int) -> String {
   return result
 }
 
-fn reverse(s: String) -> String {
+pub fn reverse(s: String) -> String {
   var result = ""
   var i = s.length - 1
   while i >= 0 {
@@ -163,12 +163,12 @@ fn reverse(s: String) -> String {
   return result
 }
 
-fn truncate(s: String, maxLen: Int, suffix: String) -> String {
+pub fn truncate(s: String, maxLen: Int, suffix: String) -> String {
   if s.length <= maxLen { return s }
   return s.substring(0, maxLen - suffix.length) + suffix
 }
 
-fn slugify(s: String) -> String {
+pub fn slugify(s: String) -> String {
   var result = ""
   for ch in toLower(s) {
     let code = ch.codeUnit
@@ -187,7 +187,7 @@ fn slugify(s: String) -> String {
   return result
 }
 
-fn wordWrap(s: String, width: Int) -> String {
+pub fn wordWrap(s: String, width: Int) -> String {
   let words = s.split(" ")
   var lines: List<String> = []
   var currentLine = ""
@@ -209,14 +209,14 @@ fn wordWrap(s: String, width: Int) -> String {
 
 // === Validation ===
 
-fn isBlank(s: String) -> Bool {
+pub fn isBlank(s: String) -> Bool {
   for ch in s {
     if !isWhitespace(ch) { return false }
   }
   return true
 }
 
-fn isNumeric(s: String) -> Bool {
+pub fn isNumeric(s: String) -> Bool {
   if s.length == 0 { return false }
   for ch in s {
     let code = ch.codeUnit
@@ -225,7 +225,7 @@ fn isNumeric(s: String) -> Bool {
   return true
 }
 
-fn isAlpha(s: String) -> Bool {
+pub fn isAlpha(s: String) -> Bool {
   if s.length == 0 { return false }
   for ch in s {
     let code = ch.codeUnit
@@ -236,7 +236,7 @@ fn isAlpha(s: String) -> Bool {
   return true
 }
 
-fn isAlphaNumeric(s: String) -> Bool {
+pub fn isAlphaNumeric(s: String) -> Bool {
   if s.length == 0 { return false }
   for ch in s {
     let code = ch.codeUnit
@@ -248,7 +248,7 @@ fn isAlphaNumeric(s: String) -> Bool {
   return true
 }
 
-fn isEmail(s: String) -> Bool {
+pub fn isEmail(s: String) -> Bool {
   let parts = s.split("@")
   if parts.length != 2 { return false }
   let local = parts[0]
@@ -262,13 +262,13 @@ fn isEmail(s: String) -> Bool {
   return true
 }
 
-fn isUrl(s: String) -> Bool {
+pub fn isUrl(s: String) -> Bool {
   return s.startsWith("http://") || s.startsWith("https://")
 }
 
 // === Template ===
 
-fn template(tmpl: String, context: Map<String, String>) -> String {
+pub fn template(tmpl: String, context: Map<String, String>) -> String {
   var result = tmpl
   for key in context.keys() {
     result = result.replaceAll("{${key}}", context[key])
@@ -312,9 +312,9 @@ fn splitWords(s: String) -> List<String> {
 
 // === Search & Count ===
 
-fn contains(s: String, sub: String) -> Bool => s.indexOf(sub) >= 0
+pub fn contains(s: String, sub: String) -> Bool => s.indexOf(sub) >= 0
 
-fn countOccurrences(s: String, sub: String) -> Int {
+pub fn countOccurrences(s: String, sub: String) -> Int {
   var count = 0
   var pos = 0
   while pos < s.length {
@@ -326,12 +326,12 @@ fn countOccurrences(s: String, sub: String) -> Int {
   return count
 }
 
-fn startsWith(s: String, prefix: String) -> Bool {
+pub fn startsWith(s: String, prefix: String) -> Bool {
   if prefix.length > s.length { return false }
   return s.substring(0, prefix.length) == prefix
 }
 
-fn endsWith(s: String, suffix: String) -> Bool {
+pub fn endsWith(s: String, suffix: String) -> Bool {
   if suffix.length > s.length { return false }
   return s.substring(s.length - suffix.length) == suffix
 }

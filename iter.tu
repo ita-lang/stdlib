@@ -3,7 +3,7 @@
 
 // === Transformation ===
 
-fn chunk<T>(list: List<T>, size: Int) -> List<List<T>> {
+pub fn chunk<T>(list: List<T>, size: Int) -> List<List<T>> {
   var result: List<List<T>> = []
   var i = 0
   while i < list.length {
@@ -14,7 +14,7 @@ fn chunk<T>(list: List<T>, size: Int) -> List<List<T>> {
   return result
 }
 
-fn window<T>(list: List<T>, size: Int) -> List<List<T>> {
+pub fn window<T>(list: List<T>, size: Int) -> List<List<T>> {
   var result: List<List<T>> = []
   var i = 0
   while i + size <= list.length {
@@ -24,7 +24,7 @@ fn window<T>(list: List<T>, size: Int) -> List<List<T>> {
   return result
 }
 
-fn zip<A, B>(a: List<A>, b: List<B>) -> List<(A, B)> {
+pub fn zip<A, B>(a: List<A>, b: List<B>) -> List<(A, B)> {
   var result: List<(A, B)> = []
   let len = if a.length < b.length { a.length } else { b.length }
   var i = 0
@@ -35,7 +35,7 @@ fn zip<A, B>(a: List<A>, b: List<B>) -> List<(A, B)> {
   return result
 }
 
-fn enumerate<T>(list: List<T>) -> List<(Int, T)> {
+pub fn enumerate<T>(list: List<T>) -> List<(Int, T)> {
   var result: List<(Int, T)> = []
   var i = 0
   for item in list {
@@ -45,7 +45,7 @@ fn enumerate<T>(list: List<T>) -> List<(Int, T)> {
   return result
 }
 
-fn flatten<T>(list: List<List<T>>) -> List<T> {
+pub fn flatten<T>(list: List<List<T>>) -> List<T> {
   var result: List<T> = []
   for sub in list {
     result = result + sub
@@ -53,7 +53,7 @@ fn flatten<T>(list: List<List<T>>) -> List<T> {
   return result
 }
 
-fn flatMap<T, U>(list: List<T>, f: (T) -> List<U>) -> List<U> {
+pub fn flatMap<T, U>(list: List<T>, f: (T) -> List<U>) -> List<U> {
   var result: List<U> = []
   for item in list {
     result = result + f(item)
@@ -61,7 +61,7 @@ fn flatMap<T, U>(list: List<T>, f: (T) -> List<U>) -> List<U> {
   return result
 }
 
-fn compact<T>(list: List<Option<T>>) -> List<T> {
+pub fn compact<T>(list: List<Option<T>>) -> List<T> {
   var result: List<T> = []
   for item in list {
     match item {
@@ -72,7 +72,7 @@ fn compact<T>(list: List<Option<T>>) -> List<T> {
   return result
 }
 
-fn intersperse<T>(list: List<T>, separator: T) -> List<T> {
+pub fn intersperse<T>(list: List<T>, separator: T) -> List<T> {
   if list.length <= 1 { return list }
   var result: List<T> = [list[0]]
   var i = 1
@@ -83,7 +83,7 @@ fn intersperse<T>(list: List<T>, separator: T) -> List<T> {
   return result
 }
 
-fn interleave<T>(a: List<T>, b: List<T>) -> List<T> {
+pub fn interleave<T>(a: List<T>, b: List<T>) -> List<T> {
   var result: List<T> = []
   let len = if a.length > b.length { a.length } else { b.length }
   var i = 0
@@ -97,7 +97,7 @@ fn interleave<T>(a: List<T>, b: List<T>) -> List<T> {
 
 // === Filtering ===
 
-fn takeWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
+pub fn takeWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
   var result: List<T> = []
   for item in list {
     if !predicate(item) { return result }
@@ -106,7 +106,7 @@ fn takeWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
   return result
 }
 
-fn skipWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
+pub fn skipWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
   var skipping = true
   var result: List<T> = []
   for item in list {
@@ -118,17 +118,17 @@ fn skipWhile<T>(list: List<T>, predicate: (T) -> Bool) -> List<T> {
   return result
 }
 
-fn take<T>(list: List<T>, n: Int) -> List<T> {
+pub fn take<T>(list: List<T>, n: Int) -> List<T> {
   if n >= list.length { return list }
   return list.slice(0, n)
 }
 
-fn skip<T>(list: List<T>, n: Int) -> List<T> {
+pub fn skip<T>(list: List<T>, n: Int) -> List<T> {
   if n >= list.length { return [] }
   return list.slice(n)
 }
 
-fn distinct<T>(list: List<T>) -> List<T> {
+pub fn distinct<T>(list: List<T>) -> List<T> {
   var result: List<T> = []
   for item in list {
     var found = false
@@ -140,7 +140,7 @@ fn distinct<T>(list: List<T>) -> List<T> {
   return result
 }
 
-fn partition<T>(list: List<T>, predicate: (T) -> Bool) -> (List<T>, List<T>) {
+pub fn partition<T>(list: List<T>, predicate: (T) -> Bool) -> (List<T>, List<T>) {
   var yes: List<T> = []
   var no: List<T> = []
   for item in list {
@@ -155,7 +155,7 @@ fn partition<T>(list: List<T>, predicate: (T) -> Bool) -> (List<T>, List<T>) {
 
 // === Aggregation ===
 
-fn scan<T, U>(list: List<T>, initial: U, f: (U, T) -> U) -> List<U> {
+pub fn scan<T, U>(list: List<T>, initial: U, f: (U, T) -> U) -> List<U> {
   var result: List<U> = [initial]
   var acc = initial
   for item in list {
@@ -165,7 +165,7 @@ fn scan<T, U>(list: List<T>, initial: U, f: (U, T) -> U) -> List<U> {
   return result
 }
 
-fn groupBy<T, K>(list: List<T>, keyFn: (T) -> K) -> List<(K, List<T>)> {
+pub fn groupBy<T, K>(list: List<T>, keyFn: (T) -> K) -> List<(K, List<T>)> {
   var keys: List<K> = []
   var groups: List<List<T>> = []
   for item in list {
@@ -194,20 +194,20 @@ fn groupBy<T, K>(list: List<T>, keyFn: (T) -> K) -> List<(K, List<T>)> {
   return result
 }
 
-fn sortBy<T>(list: List<T>, keyFn: (T) -> Int) -> List<T> {
+pub fn sortBy<T>(list: List<T>, keyFn: (T) -> Int) -> List<T> {
   return quickSort(list, (a, b) => keyFn(a) - keyFn(b))
 }
 
 // === Search ===
 
-fn find<T>(list: List<T>, predicate: (T) -> Bool) -> Option<T> {
+pub fn find<T>(list: List<T>, predicate: (T) -> Bool) -> Option<T> {
   for item in list {
     if predicate(item) { return .some(item) }
   }
   return .none
 }
 
-fn findIndex<T>(list: List<T>, predicate: (T) -> Bool) -> Option<Int> {
+pub fn findIndex<T>(list: List<T>, predicate: (T) -> Bool) -> Option<Int> {
   var i = 0
   for item in list {
     if predicate(item) { return .some(i) }
@@ -216,28 +216,28 @@ fn findIndex<T>(list: List<T>, predicate: (T) -> Bool) -> Option<Int> {
   return .none
 }
 
-fn any<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
+pub fn any<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
   for item in list {
     if predicate(item) { return true }
   }
   return false
 }
 
-fn all<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
+pub fn all<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
   for item in list {
     if !predicate(item) { return false }
   }
   return true
 }
 
-fn none<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
+pub fn none<T>(list: List<T>, predicate: (T) -> Bool) -> Bool {
   for item in list {
     if predicate(item) { return false }
   }
   return true
 }
 
-fn count<T>(list: List<T>, predicate: (T) -> Bool) -> Int {
+pub fn count<T>(list: List<T>, predicate: (T) -> Bool) -> Int {
   var c = 0
   for item in list {
     if predicate(item) { c += 1 }
@@ -245,7 +245,7 @@ fn count<T>(list: List<T>, predicate: (T) -> Bool) -> Int {
   return c
 }
 
-fn maxBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
+pub fn maxBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
   if list.length == 0 { return .none }
   var best = list[0]
   var bestKey = keyFn(best)
@@ -261,7 +261,7 @@ fn maxBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
   return .some(best)
 }
 
-fn minBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
+pub fn minBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
   if list.length == 0 { return .none }
   var best = list[0]
   var bestKey = keyFn(best)
@@ -279,7 +279,7 @@ fn minBy<T>(list: List<T>, keyFn: (T) -> Int) -> Option<T> {
 
 // === Helpers (imported from collections for sortBy) ===
 
-fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   if list.length <= 1 { return list }
   let pivot = list[list.length / 2]
   var less: List<T> = []
