@@ -1,13 +1,11 @@
 // Regressão de runtime: server
 // Exercita: App.new, get/post (registro de rota), handle(req sintético) →
 //           status/body, matching de rota com param (:id) → 200,
+//           handler LENDO req.params.get("id") (inferência de contexto do param
+//           da closure + copy-with sobre param tipado + `Option ?? default`),
 //           404 em rota inexistente, Response factories
 //           (ok/json/notFound/redirect/created), parseQuery.
 //           Request construído à mão → sem rede, determinístico.
-// NOTA: o handler da rota :id NÃO lê req.params.get("id") — esse caminho
-// crasha no codegen atual (`_Map has no method 'get'` no map de params vindo
-// do copy-with). O matching da rota em si funciona (retorna 200). Bug da
-// stdlib/compilador; ler o param de volta quando corrigido.
 import { App, Request, Response, parseQuery } from "server"
 
 fn req(method: String, path: String) -> Request {
@@ -17,7 +15,7 @@ fn req(method: String, path: String) -> Request {
 fn main() {
   var app = App.new()
   app = app.get("/hello", (r) => Response.ok("Hello!"))
-  app = app.get("/users/:id", (r) => Response.ok("user-matched"))
+  app = app.get("/users/:id", (r) => Response.ok("user " + (r.params.get("id") ?? "?")))
   app = app.post("/users", (r) => Response.created("{\"created\":true}"))
   println("app port = " + app.port.toString())
 
@@ -27,7 +25,7 @@ fn main() {
 
   let u = app.handle(req("GET", "/users/42"))
   println("user status = " + u.status.toString())
-  println("user body = " + u.body)   // rota :id casou → user-matched
+  println("user body = " + u.body)   // rota :id casou + leu params → "user 42"
 
   let created = app.handle(req("POST", "/users"))
   println("created status = " + created.status.toString())
