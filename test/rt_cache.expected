@@ -1,0 +1,15 @@
+
+get a => some(1)
+get b => some(2)
+get x => none
+size => 2
+has a => true
+has x => false
+after delete get a => none
+size after delete => 1
+size after clear => 0
+getOrSet miss value => 99
+getOrSet cache size => 3
+ttl get within window => some(7)
+ttl get after expiry => none
+size after prune => 0

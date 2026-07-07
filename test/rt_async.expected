@@ -1,0 +1,15 @@
+
+acquired, available = 1
+isFull(empty) = false
+release available = 2
+debounce first(now=0) = false
+debounce within window = false
+debounce after window = true
+throttle first = false
+throttle within = false
+rate 1st allowed = true
+rate 2nd allowed = true
+rate 3rd allowed = false
+rate remaining = 0
+pool size = 3
+pool acquire = 10

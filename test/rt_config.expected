@@ -1,0 +1,11 @@
+
+has host = true
+has nope = false
+getString host = localhost
+getInt port = 8080
+getInt missing = 42
+getBool debug = true
+getBool missing = false
+get host = localhost
+get nope = none
+keys = [host, port, debug]

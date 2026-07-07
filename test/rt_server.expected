@@ -1,0 +1,15 @@
+
+app port = 3000
+hello status = 200
+hello body = Hello!
+user status = 200
+user body = user-matched
+created status = 201
+miss status = 404
+ok status = 200
+ok body = test
+json status = 200
+notFound status = 404
+redirect status = 302
+query a = 1
+query b = 2

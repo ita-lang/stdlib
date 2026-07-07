@@ -1,0 +1,11 @@
+
+listeners = 1
+listener A got: hello
+listener A got: world
+listeners with once = 2
+listener A got: first
+once got: first
+listeners after once fired = 1
+listener A got: second
+listeners after off = 0
+listeners after removeAll = 0

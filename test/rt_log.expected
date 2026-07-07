@@ -1,0 +1,7 @@
+
+[INFO]  [app] server started
+[WARN]  [app] low memory
+[ERROR] [app] connection failed
+[DEBUG] [db] verbose on
+[INFO]  [db] query done | reqId=42
+[WARN]  [db] slow query | ms=1200
