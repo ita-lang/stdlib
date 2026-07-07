@@ -10,22 +10,22 @@ let infinity = 1.0 / 0.0
 
 // === Basic ===
 
-fn abs(x: Int) -> Int => match x { _ if x < 0 => -x, _ => x }
-fn absf(x: Float) -> Float => match x { _ if x < 0.0 => -x, _ => x }
+pub fn abs(x: Int) -> Int => match x { _ if x < 0 => -x, _ => x }
+pub fn absf(x: Float) -> Float => match x { _ if x < 0.0 => -x, _ => x }
 
-fn min(a: Int, b: Int) -> Int => match a { _ if a < b => a, _ => b }
-fn max(a: Int, b: Int) -> Int => match a { _ if a > b => a, _ => b }
-fn minf(a: Float, b: Float) -> Float => match a { _ if a < b => a, _ => b }
-fn maxf(a: Float, b: Float) -> Float => match a { _ if a > b => a, _ => b }
+pub fn min(a: Int, b: Int) -> Int => match a { _ if a < b => a, _ => b }
+pub fn max(a: Int, b: Int) -> Int => match a { _ if a > b => a, _ => b }
+pub fn minf(a: Float, b: Float) -> Float => match a { _ if a < b => a, _ => b }
+pub fn maxf(a: Float, b: Float) -> Float => match a { _ if a > b => a, _ => b }
 
-fn clamp(value: Int, low: Int, high: Int) -> Int => min(max(value, low), high)
-fn clampf(value: Float, low: Float, high: Float) -> Float => minf(maxf(value, low), high)
+pub fn clamp(value: Int, low: Int, high: Int) -> Int => min(max(value, low), high)
+pub fn clampf(value: Float, low: Float, high: Float) -> Float => minf(maxf(value, low), high)
 
-fn lerp(a: Float, b: Float, t: Float) -> Float => a + (b - a) * t
+pub fn lerp(a: Float, b: Float, t: Float) -> Float => a + (b - a) * t
 
 // === Aggregation ===
 
-fn sum(list: List<Int>) -> Int {
+pub fn sum(list: List<Int>) -> Int {
   var acc = 0
   for item in list {
     acc += item
@@ -33,7 +33,7 @@ fn sum(list: List<Int>) -> Int {
   return acc
 }
 
-fn sumf(list: List<Float>) -> Float {
+pub fn sumf(list: List<Float>) -> Float {
   var acc = 0.0
   for item in list {
     acc += item
@@ -41,19 +41,19 @@ fn sumf(list: List<Float>) -> Float {
   return acc
 }
 
-fn avg(list: List<Int>) -> Float {
+pub fn avg(list: List<Int>) -> Float {
   if list.length == 0 { return 0.0 }
   return sum(list) / list.length
 }
 
-fn avgf(list: List<Float>) -> Float {
+pub fn avgf(list: List<Float>) -> Float {
   if list.length == 0 { return 0.0 }
   return sumf(list) / list.length
 }
 
 // === Number Theory ===
 
-fn gcd(a: Int, b: Int) -> Int {
+pub fn gcd(a: Int, b: Int) -> Int {
   var x = abs(a)
   var y = abs(b)
   while y != 0 {
@@ -64,12 +64,12 @@ fn gcd(a: Int, b: Int) -> Int {
   return x
 }
 
-fn lcm(a: Int, b: Int) -> Int {
+pub fn lcm(a: Int, b: Int) -> Int {
   if a == 0 && b == 0 { return 0 }
   return abs(a * b) / gcd(a, b)
 }
 
-fn isPrime(n: Int) -> Bool {
+pub fn isPrime(n: Int) -> Bool {
   if n < 2 { return false }
   if n < 4 { return true }
   if n % 2 == 0 { return false }
@@ -83,7 +83,7 @@ fn isPrime(n: Int) -> Bool {
   return true
 }
 
-fn fibonacci(n: Int) -> Int {
+pub fn fibonacci(n: Int) -> Int {
   if n <= 0 { return 0 }
   if n == 1 { return 1 }
   var a = 0
@@ -98,7 +98,7 @@ fn fibonacci(n: Int) -> Int {
   return b
 }
 
-fn factorial(n: Int) -> Int {
+pub fn factorial(n: Int) -> Int {
   if n <= 1 { return 1 }
   var result = 1
   var i = 2
@@ -111,7 +111,7 @@ fn factorial(n: Int) -> Int {
 
 // === Powers & Roots ===
 
-fn pow(base: Int, exp: Int) -> Int {
+pub fn pow(base: Int, exp: Int) -> Int {
   if exp == 0 { return 1 }
   if exp < 0 { return 0 }
   var result = 1
@@ -127,7 +127,7 @@ fn pow(base: Int, exp: Int) -> Int {
   return result
 }
 
-fn isqrt(n: Int) -> Int {
+pub fn isqrt(n: Int) -> Int {
   if n < 0 { return 0 }
   if n == 0 { return 0 }
   var x = n
@@ -141,7 +141,7 @@ fn isqrt(n: Int) -> Int {
 
 // === Sequences ===
 
-fn range(start: Int, end: Int) -> List<Int> {
+pub fn range(start: Int, end: Int) -> List<Int> {
   var result: List<Int> = []
   var i = start
   while i < end {
@@ -151,7 +151,7 @@ fn range(start: Int, end: Int) -> List<Int> {
   return result
 }
 
-fn rangeStep(start: Int, end: Int, step: Int) -> List<Int> {
+pub fn rangeStep(start: Int, end: Int, step: Int) -> List<Int> {
   var result: List<Int> = []
   var i = start
   if step > 0 {
@@ -170,22 +170,22 @@ fn rangeStep(start: Int, end: Int, step: Int) -> List<Int> {
 
 // === Conversions ===
 
-fn toRadians(degrees: Float) -> Float => degrees * pi / 180.0
-fn toDegrees(radians: Float) -> Float => radians * 180.0 / pi
+pub fn toRadians(degrees: Float) -> Float => degrees * pi / 180.0
+pub fn toDegrees(radians: Float) -> Float => radians * 180.0 / pi
 
 // === Sign ===
 
-fn sign(x: Int) -> Int {
+pub fn sign(x: Int) -> Int {
   if x > 0 { return 1 }
   if x < 0 { return -1 }
   return 0
 }
 
-fn signf(x: Float) -> Float {
+pub fn signf(x: Float) -> Float {
   if x > 0.0 { return 1.0 }
   if x < 0.0 { return -1.0 }
   return 0.0
 }
 
-fn isEven(n: Int) -> Bool => n % 2 == 0
-fn isOdd(n: Int) -> Bool => n % 2 != 0
+pub fn isEven(n: Int) -> Bool => n % 2 == 0
+pub fn isOdd(n: Int) -> Bool => n % 2 != 0

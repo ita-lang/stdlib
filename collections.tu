@@ -1061,7 +1061,7 @@ fn _find(parent: List<Int>, node: Int) -> Int {
 
 // === Merge Sort — O(n log n), stable ===
 
-fn mergeSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn mergeSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   if list.length <= 1 { return list }
   let mid = list.length / 2
   let left = mergeSort(list.slice(0, mid), compare)
@@ -1095,7 +1095,7 @@ fn _merge<T>(left: List<T>, right: List<T>, compare: (T, T) -> Int) -> List<T> {
 
 // === Quick Sort — O(n log n) average, in-place concept ===
 
-fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   if list.length <= 1 { return list }
   let pivot = list[list.length / 2]
   var less: List<T> = []
@@ -1116,7 +1116,7 @@ fn quickSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
 
 // === Heap Sort — O(n log n), not stable ===
 
-fn heapSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn heapSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   var h = list
   let n = h.length
 
@@ -1159,7 +1159,7 @@ fn _siftDown<T>(heap: List<T>, start: Int, end: Int, compare: (T, T) -> Int) -> 
 
 // === Insertion Sort — O(n²), stable, good for small lists ===
 
-fn insertionSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn insertionSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   var h = list
   var i = 1
   while i < h.length {
@@ -1177,7 +1177,7 @@ fn insertionSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
 
 // === Tim Sort — Hybrid: insertion + merge, O(n log n), stable ===
 
-fn timSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
+pub fn timSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
   let minRun = 32
   var h = list
   let n = h.length
@@ -1219,7 +1219,7 @@ fn timSort<T>(list: List<T>, compare: (T, T) -> Int) -> List<T> {
 
 // === Radix Sort — O(nk) for integers ===
 
-fn radixSort(list: List<Int>) -> List<Int> {
+pub fn radixSort(list: List<Int>) -> List<Int> {
   if list.length <= 1 { return list }
 
   // Handle negatives: separate, sort positives, reverse negatives
@@ -1282,7 +1282,7 @@ fn _radixSortPositive(list: List<Int>) -> List<Int> {
 
 // === Utility ===
 
-fn isSorted<T>(list: List<T>, compare: (T, T) -> Int) -> Bool {
+pub fn isSorted<T>(list: List<T>, compare: (T, T) -> Int) -> Bool {
   if list.length <= 1 { return true }
   var i = 1
   while i < list.length {
