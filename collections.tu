@@ -28,31 +28,33 @@
 
 pub struct Stack<T> {
   items: List<T>
+}
 
-  pub fn new() -> Stack<T> => Stack { items: [] }
+extension Stack {
+  static fn new() -> Stack<T> => Stack(items: [])
 
   // O(n) — cria nova lista com o elemento adicionado ao final
-  pub fn push(self, value: T) -> Stack<T> {
-    return Stack { items: self.items + [value] }
+  pub fn push(value: T) -> Stack<T> {
+    return Stack(items: self.items + [value])
   }
 
   // O(n) — cria nova lista sem o ultimo elemento
-  pub fn pop(self) -> Option<(T, Stack<T>)> {
+  pub fn pop() -> Option<(T, Stack<T>)> {
     if self.items.length == 0 { return .none }
     let top = self.items[self.items.length - 1]
     let rest = self.items.slice(0, self.items.length - 1)
-    return .some((top, Stack { items: rest }))
+    return .some((top, Stack(items: rest)))
   }
 
   // O(1) — acesso direto
-  pub fn peek(self) -> Option<T> {
+  pub fn peek() -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[self.items.length - 1])
   }
 
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn size(self) -> Int => self.items.length
-  pub fn toList(self) -> List<T> => self.items
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn size() -> Int => self.items.length
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -72,16 +74,18 @@ pub struct Stack<T> {
 
 pub struct MutStack<T> {
   var items: List<T>
+}
 
-  pub fn new() -> MutStack<T> => MutStack { items: [] }
+extension MutStack {
+  static fn new() -> MutStack<T> => MutStack(items: [])
 
   // O(1) amortizado — modifica in-place
-  pub fn push(self, value: T) {
+  pub fn push(value: T) {
     self.items = self.items + [value]
   }
 
   // O(1) — remove ultimo in-place
-  pub fn pop(self) -> Option<T> {
+  pub fn pop() -> Option<T> {
     if self.items.length == 0 { return .none }
     let top = self.items[self.items.length - 1]
     self.items = self.items.slice(0, self.items.length - 1)
@@ -89,14 +93,14 @@ pub struct MutStack<T> {
   }
 
   // O(1)
-  pub fn peek(self) -> Option<T> {
+  pub fn peek() -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[self.items.length - 1])
   }
 
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn size(self) -> Int => self.items.length
-  pub fn toList(self) -> List<T> => self.items
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn size() -> Int => self.items.length
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -109,31 +113,33 @@ pub struct MutStack<T> {
 
 pub struct Queue<T> {
   items: List<T>
+}
 
-  pub fn new() -> Queue<T> => Queue { items: [] }
+extension Queue {
+  static fn new() -> Queue<T> => Queue(items: [])
 
   // O(n) — cria nova lista com elemento no final
-  pub fn enqueue(self, value: T) -> Queue<T> {
-    return Queue { items: self.items + [value] }
+  pub fn enqueue(value: T) -> Queue<T> {
+    return Queue(items: self.items + [value])
   }
 
   // O(n) — cria nova lista sem o primeiro
-  pub fn dequeue(self) -> Option<(T, Queue<T>)> {
+  pub fn dequeue() -> Option<(T, Queue<T>)> {
     if self.items.length == 0 { return .none }
     let front = self.items[0]
     let rest = self.items.slice(1)
-    return .some((front, Queue { items: rest }))
+    return .some((front, Queue(items: rest)))
   }
 
   // O(1)
-  pub fn peek(self) -> Option<T> {
+  pub fn peek() -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[0])
   }
 
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn size(self) -> Int => self.items.length
-  pub fn toList(self) -> List<T> => self.items
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn size() -> Int => self.items.length
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -150,16 +156,18 @@ pub struct Queue<T> {
 pub struct MutQueue<T> {
   var inbox: List<T>
   var outbox: List<T>
+}
 
-  pub fn new() -> MutQueue<T> => MutQueue { inbox: [], outbox: [] }
+extension MutQueue {
+  static fn new() -> MutQueue<T> => MutQueue(inbox: [], outbox: [])
 
   // O(1) amortizado
-  pub fn enqueue(self, value: T) {
+  pub fn enqueue(value: T) {
     self.inbox = self.inbox + [value]
   }
 
   // O(1) amortizado — O(n) quando outbox vazia (reverte inbox)
-  pub fn dequeue(self) -> Option<T> {
+  pub fn dequeue() -> Option<T> {
     if self.outbox.length == 0 {
       if self.inbox.length == 0 { return .none }
       // Reverter inbox para outbox
@@ -175,8 +183,8 @@ pub struct MutQueue<T> {
     return .some(front)
   }
 
-  pub fn isEmpty(self) -> Bool => self.inbox.length == 0 && self.outbox.length == 0
-  pub fn size(self) -> Int => self.inbox.length + self.outbox.length
+  pub fn isEmpty() -> Bool => self.inbox.length == 0 && self.outbox.length == 0
+  pub fn size() -> Int => self.inbox.length + self.outbox.length
 }
 
 // ============================================================
@@ -186,50 +194,52 @@ pub struct MutQueue<T> {
 
 pub struct Deque<T> {
   items: List<T>
+}
 
-  pub fn new() -> Deque<T> => Deque { items: [] }
+extension Deque {
+  static fn new() -> Deque<T> => Deque(items: [])
 
   // O(n) — prepend + copia
-  pub fn pushFront(self, value: T) -> Deque<T> {
-    return Deque { items: [value] + self.items }
+  pub fn pushFront(value: T) -> Deque<T> {
+    return Deque(items: [value] + self.items)
   }
 
   // O(n) — append + copia
-  pub fn pushBack(self, value: T) -> Deque<T> {
-    return Deque { items: self.items + [value] }
+  pub fn pushBack(value: T) -> Deque<T> {
+    return Deque(items: self.items + [value])
   }
 
   // O(n)
-  pub fn popFront(self) -> Option<(T, Deque<T>)> {
+  pub fn popFront() -> Option<(T, Deque<T>)> {
     if self.items.length == 0 { return .none }
     let front = self.items[0]
     let rest = self.items.slice(1)
-    return .some((front, Deque { items: rest }))
+    return .some((front, Deque(items: rest)))
   }
 
   // O(n)
-  pub fn popBack(self) -> Option<(T, Deque<T>)> {
+  pub fn popBack() -> Option<(T, Deque<T>)> {
     if self.items.length == 0 { return .none }
     let back = self.items[self.items.length - 1]
     let rest = self.items.slice(0, self.items.length - 1)
-    return .some((back, Deque { items: rest }))
+    return .some((back, Deque(items: rest)))
   }
 
   // O(1)
-  pub fn peekFront(self) -> Option<T> {
+  pub fn peekFront() -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[0])
   }
 
   // O(1)
-  pub fn peekBack(self) -> Option<T> {
+  pub fn peekBack() -> Option<T> {
     if self.items.length == 0 { return .none }
     return .some(self.items[self.items.length - 1])
   }
 
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn size(self) -> Int => self.items.length
-  pub fn toList(self) -> List<T> => self.items
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn size() -> Int => self.items.length
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -242,21 +252,23 @@ pub struct Deque<T> {
 
 pub struct MutDeque<T> {
   var items: List<T>
+}
 
-  pub fn new() -> MutDeque<T> => MutDeque { items: [] }
+extension MutDeque {
+  static fn new() -> MutDeque<T> => MutDeque(items: [])
 
   // O(n) — prepend
-  pub fn pushFront(self, value: T) {
+  pub fn pushFront(value: T) {
     self.items = [value] + self.items
   }
 
   // O(1) amortizado
-  pub fn pushBack(self, value: T) {
+  pub fn pushBack(value: T) {
     self.items = self.items + [value]
   }
 
   // O(n) — shift
-  pub fn popFront(self) -> Option<T> {
+  pub fn popFront() -> Option<T> {
     if self.items.length == 0 { return .none }
     let front = self.items[0]
     self.items = self.items.slice(1)
@@ -264,16 +276,16 @@ pub struct MutDeque<T> {
   }
 
   // O(1)
-  pub fn popBack(self) -> Option<T> {
+  pub fn popBack() -> Option<T> {
     if self.items.length == 0 { return .none }
     let back = self.items[self.items.length - 1]
     self.items = self.items.slice(0, self.items.length - 1)
     return .some(back)
   }
 
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn size(self) -> Int => self.items.length
-  pub fn toList(self) -> List<T> => self.items
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn size() -> Int => self.items.length
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -284,21 +296,23 @@ pub struct MutDeque<T> {
 pub struct PriorityQueue<T> {
   heap: List<T>
   compare: (T, T) -> Int
+}
 
-  pub fn new(compare: (T, T) -> Int) -> PriorityQueue<T> {
-    return PriorityQueue { heap: [], compare: compare }
+extension PriorityQueue {
+  static fn new(compare: (T, T) -> Int) -> PriorityQueue<T> {
+    return PriorityQueue(heap: [], compare: compare)
   }
 
-  pub fn minQueue() -> PriorityQueue<Int> {
+  static fn minQueue() -> PriorityQueue<Int> {
     return PriorityQueue.new((a, b) => a - b)
   }
 
-  pub fn maxQueue() -> PriorityQueue<Int> {
+  static fn maxQueue() -> PriorityQueue<Int> {
     return PriorityQueue.new((a, b) => b - a)
   }
 
   // O(n log n) — sift-up com copia a cada swap
-  pub fn insert(self, value: T) -> PriorityQueue<T> {
+  pub fn insert(value: T) -> PriorityQueue<T> {
     var h = self.heap + [value]
     var i = h.length - 1
     while i > 0 {
@@ -312,14 +326,14 @@ pub struct PriorityQueue<T> {
         i = 0
       }
     }
-    return PriorityQueue { heap: h, compare: self.compare }
+    return PriorityQueue(heap: h, compare: self.compare)
   }
 
   // O(n log n) — sift-down com copia a cada swap
-  pub fn extractTop(self) -> Option<(T, PriorityQueue<T>)> {
+  pub fn extractTop() -> Option<(T, PriorityQueue<T>)> {
     if self.heap.length == 0 { return .none }
     if self.heap.length == 1 {
-      return .some((self.heap[0], PriorityQueue { heap: [], compare: self.compare }))
+      return .some((self.heap[0], PriorityQueue(heap: [], compare: self.compare)))
     }
     let top = self.heap[0]
     var h = self.heap.set(0, self.heap[self.heap.length - 1])
@@ -335,22 +349,22 @@ pub struct PriorityQueue<T> {
       if right < h.length && self.compare(h[right], h[smallest]) < 0 {
         smallest = right
       }
-      if smallest == i { return .some((top, PriorityQueue { heap: h, compare: self.compare })) }
+      if smallest == i { return .some((top, PriorityQueue(heap: h, compare: self.compare))) }
       let temp = h[i]
       h = h.set(i, h[smallest])
       h = h.set(smallest, temp)
       i = smallest
     }
-    return .some((top, PriorityQueue { heap: h, compare: self.compare }))
+    return .some((top, PriorityQueue(heap: h, compare: self.compare)))
   }
 
-  pub fn peek(self) -> Option<T> {
+  pub fn peek() -> Option<T> {
     if self.heap.length == 0 { return .none }
     return .some(self.heap[0])
   }
 
-  pub fn isEmpty(self) -> Bool => self.heap.length == 0
-  pub fn size(self) -> Int => self.heap.length
+  pub fn isEmpty() -> Bool => self.heap.length == 0
+  pub fn size() -> Int => self.heap.length
 }
 
 // ============================================================
@@ -361,13 +375,15 @@ pub struct PriorityQueue<T> {
 pub struct MutPriorityQueue<T> {
   var heap: List<T>
   compare: (T, T) -> Int
+}
 
-  pub fn new(compare: (T, T) -> Int) -> MutPriorityQueue<T> {
-    return MutPriorityQueue { heap: [], compare: compare }
+extension MutPriorityQueue {
+  static fn new(compare: (T, T) -> Int) -> MutPriorityQueue<T> {
+    return MutPriorityQueue(heap: [], compare: compare)
   }
 
   // O(log n) — sift-up in-place
-  pub fn insert(self, value: T) {
+  pub fn insert(value: T) {
     self.heap = self.heap + [value]
     var i = self.heap.length - 1
     while i > 0 {
@@ -384,7 +400,7 @@ pub struct MutPriorityQueue<T> {
   }
 
   // O(log n) — sift-down in-place
-  pub fn extractTop(self) -> Option<T> {
+  pub fn extractTop() -> Option<T> {
     if self.heap.length == 0 { return .none }
     let top = self.heap[0]
     self.heap = self.heap.set(0, self.heap[self.heap.length - 1])
@@ -409,13 +425,13 @@ pub struct MutPriorityQueue<T> {
     return .some(top)
   }
 
-  pub fn peek(self) -> Option<T> {
+  pub fn peek() -> Option<T> {
     if self.heap.length == 0 { return .none }
     return .some(self.heap[0])
   }
 
-  pub fn isEmpty(self) -> Bool => self.heap.length == 0
-  pub fn size(self) -> Int => self.heap.length
+  pub fn isEmpty() -> Bool => self.heap.length == 0
+  pub fn size() -> Int => self.heap.length
 }
 
 // ============================================================
@@ -427,36 +443,38 @@ pub struct Ring<T> {
   items: List<T>
   capacity: Int
   writePos: Int
+}
 
-  pub fn new(capacity: Int) -> Ring<T> {
-    return Ring { items: [], capacity: capacity, writePos: 0 }
+extension Ring {
+  static fn new(capacity: Int) -> Ring<T> {
+    return Ring(items: [], capacity: capacity, writePos: 0)
   }
 
   // O(n)
-  pub fn push(self, value: T) -> Ring<T> {
+  pub fn push(value: T) -> Ring<T> {
     if self.items.length < self.capacity {
-      return Ring {
+      return Ring(
         items: self.items + [value],
         capacity: self.capacity,
         writePos: self.items.length + 1
-      }
+      )
     }
     let pos = self.writePos % self.capacity
-    return Ring {
+    return Ring(
       items: self.items.set(pos, value),
       capacity: self.capacity,
       writePos: self.writePos + 1
-    }
+    )
   }
 
-  pub fn toList(self) -> List<T> {
+  pub fn toList() -> List<T> {
     if self.items.length < self.capacity { return self.items }
     let start = self.writePos % self.capacity
     return self.items.slice(start) + self.items.slice(0, start)
   }
 
-  pub fn isFull(self) -> Bool => self.items.length == self.capacity
-  pub fn size(self) -> Int => self.items.length
+  pub fn isFull() -> Bool => self.items.length == self.capacity
+  pub fn size() -> Int => self.items.length
 }
 
 // ============================================================
@@ -467,29 +485,31 @@ pub struct Ring<T> {
 pub struct OrderedMap<K, V> {
   keys: List<K>
   values: List<V>
+}
 
-  pub fn new() -> OrderedMap<K, V> => OrderedMap { keys: [], values: [] }
+extension OrderedMap {
+  static fn new() -> OrderedMap<K, V> => OrderedMap(keys: [], values: [])
 
   // O(n)
-  pub fn set(self, key: K, value: V) -> OrderedMap<K, V> {
+  pub fn set(key: K, value: V) -> OrderedMap<K, V> {
     var i = 0
     while i < self.keys.length {
       if self.keys[i] == key {
-        return OrderedMap {
+        return OrderedMap(
           keys: self.keys,
           values: self.values.set(i, value)
-        }
+        )
       }
       i += 1
     }
-    return OrderedMap {
+    return OrderedMap(
       keys: self.keys + [key],
       values: self.values + [value]
-    }
+    )
   }
 
   // O(n)
-  pub fn get(self, key: K) -> Option<V> {
+  pub fn get(key: K) -> Option<V> {
     var i = 0
     while i < self.keys.length {
       if self.keys[i] == key { return .some(self.values[i]) }
@@ -499,7 +519,7 @@ pub struct OrderedMap<K, V> {
   }
 
   // O(n)
-  pub fn has(self, key: K) -> Bool {
+  pub fn has(key: K) -> Bool {
     for k in self.keys {
       if k == key { return true }
     }
@@ -507,7 +527,7 @@ pub struct OrderedMap<K, V> {
   }
 
   // O(n)
-  pub fn remove(self, key: K) -> OrderedMap<K, V> {
+  pub fn remove(key: K) -> OrderedMap<K, V> {
     var newKeys: List<K> = []
     var newValues: List<V> = []
     var i = 0
@@ -518,13 +538,13 @@ pub struct OrderedMap<K, V> {
       }
       i += 1
     }
-    return OrderedMap { keys: newKeys, values: newValues }
+    return OrderedMap(keys: newKeys, values: newValues)
   }
 
-  pub fn size(self) -> Int => self.keys.length
-  pub fn isEmpty(self) -> Bool => self.keys.length == 0
+  pub fn size() -> Int => self.keys.length
+  pub fn isEmpty() -> Bool => self.keys.length == 0
 
-  pub fn entries(self) -> List<(K, V)> {
+  pub fn entries() -> List<(K, V)> {
     var result: List<(K, V)> = []
     var i = 0
     while i < self.keys.length {
@@ -543,28 +563,30 @@ pub struct OrderedMap<K, V> {
 
 pub struct OrderedSet<T> {
   items: List<T>
+}
 
-  pub fn new() -> OrderedSet<T> => OrderedSet { items: [] }
+extension OrderedSet {
+  static fn new() -> OrderedSet<T> => OrderedSet(items: [])
 
   // O(n) — verifica duplicata + copia
-  pub fn add(self, value: T) -> OrderedSet<T> {
+  pub fn add(value: T) -> OrderedSet<T> {
     for item in self.items {
       if item == value { return self }
     }
-    return OrderedSet { items: self.items + [value] }
+    return OrderedSet(items: self.items + [value])
   }
 
   // O(n)
-  pub fn remove(self, value: T) -> OrderedSet<T> {
+  pub fn remove(value: T) -> OrderedSet<T> {
     var newItems: List<T> = []
     for item in self.items {
       if item != value { newItems = newItems + [item] }
     }
-    return OrderedSet { items: newItems }
+    return OrderedSet(items: newItems)
   }
 
   // O(n)
-  pub fn has(self, value: T) -> Bool {
+  pub fn has(value: T) -> Bool {
     for item in self.items {
       if item == value { return true }
     }
@@ -572,7 +594,7 @@ pub struct OrderedSet<T> {
   }
 
   // O(n*m)
-  pub fn union(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  pub fn union(other: OrderedSet<T>) -> OrderedSet<T> {
     var result = self
     for item in other.items {
       result = result.add(item)
@@ -581,7 +603,7 @@ pub struct OrderedSet<T> {
   }
 
   // O(n*m)
-  pub fn intersection(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  pub fn intersection(other: OrderedSet<T>) -> OrderedSet<T> {
     var result = OrderedSet.new()
     for item in self.items {
       if other.has(item) { result = result.add(item) }
@@ -590,7 +612,7 @@ pub struct OrderedSet<T> {
   }
 
   // O(n*m)
-  pub fn difference(self, other: OrderedSet<T>) -> OrderedSet<T> {
+  pub fn difference(other: OrderedSet<T>) -> OrderedSet<T> {
     var result = OrderedSet.new()
     for item in self.items {
       if !other.has(item) { result = result.add(item) }
@@ -598,9 +620,9 @@ pub struct OrderedSet<T> {
     return result
   }
 
-  pub fn size(self) -> Int => self.items.length
-  pub fn isEmpty(self) -> Bool => self.items.length == 0
-  pub fn toList(self) -> List<T> => self.items
+  pub fn size() -> Int => self.items.length
+  pub fn isEmpty() -> Bool => self.items.length == 0
+  pub fn toList() -> List<T> => self.items
 }
 
 // ============================================================
@@ -610,41 +632,45 @@ pub struct OrderedSet<T> {
 struct Graph<T> {
   nodes: List<T>
   edges: List<(Int, Int)>
+}
 
-  fn new() -> Graph<T> => Graph { nodes: [], edges: [] }
+extension Graph {
+  static fn new() -> Graph<T> => Graph(nodes: [], edges: [])
 
-  fn addNode(self, value: T) -> Graph<T> {
-    return Graph { nodes: self.nodes + [value], edges: self.edges }
+  fn addNode(value: T) -> Graph<T> {
+    return Graph(nodes: self.nodes + [value], edges: self.edges)
   }
 
-  fn addEdge(self, from: Int, to: Int) -> Graph<T> {
-    return Graph { nodes: self.nodes, edges: self.edges + [(from, to)] }
+  fn addEdge(from: Int, to: Int) -> Graph<T> {
+    return Graph(nodes: self.nodes, edges: self.edges + [(from, to)])
   }
 
-  fn neighbors(self, node: Int) -> List<Int> {
+  fn neighbors(node: Int) -> List<Int> {
     var result: List<Int> = []
     for edge in self.edges {
-      let {a, b} = edge
+      let a = edge.0
+      let b = edge.1
       if a == node { result = result + [b] }
       if b == node { result = result + [a] }
     }
     return result
   }
 
-  fn hasEdge(self, from: Int, to: Int) -> Bool {
+  fn hasEdge(from: Int, to: Int) -> Bool {
     for edge in self.edges {
-      let {a, b} = edge
+      let a = edge.0
+      let b = edge.1
       if (a == from && b == to) || (a == to && b == from) { return true }
     }
     return false
   }
 
-  fn degree(self, node: Int) -> Int => self.neighbors(node).length
+  fn degree(node: Int) -> Int => self.neighbors(node).length
 
-  fn nodeCount(self) -> Int => self.nodes.length
-  fn edgeCount(self) -> Int => self.edges.length
+  fn nodeCount() -> Int => self.nodes.length
+  fn edgeCount() -> Int => self.edges.length
 
-  fn bfs(self, start: Int) -> List<Int> {
+  fn bfs(start: Int) -> List<Int> {
     var visited: List<Bool> = []
     var i = 0
     while i < self.nodes.length {
@@ -668,7 +694,7 @@ struct Graph<T> {
     return result
   }
 
-  fn dfs(self, start: Int) -> List<Int> {
+  fn dfs(start: Int) -> List<Int> {
     var visited: List<Bool> = []
     var i = 0
     while i < self.nodes.length {
@@ -696,13 +722,13 @@ struct Graph<T> {
     return result
   }
 
-  fn isConnected(self) -> Bool {
+  fn isConnected() -> Bool {
     if self.nodes.length == 0 { return true }
     let visited = self.bfs(0)
     return visited.length == self.nodes.length
   }
 
-  fn hasCycle(self) -> Bool {
+  fn hasCycle() -> Bool {
     var visited: List<Bool> = []
     var i = 0
     while i < self.nodes.length {
@@ -719,7 +745,7 @@ struct Graph<T> {
     return false
   }
 
-  fn _hasCycleDfs(self, node: Int, parent: Int, visited: List<Bool>) -> Bool {
+  fn _hasCycleDfs(node: Int, parent: Int, visited: List<Bool>) -> Bool {
     var vis = visited.set(node, true)
     for neighbor in self.neighbors(node) {
       if !vis[neighbor] {
@@ -739,47 +765,52 @@ struct Graph<T> {
 struct DiGraph<T> {
   nodes: List<T>
   edges: List<(Int, Int)>
+}
 
-  fn new() -> DiGraph<T> => DiGraph { nodes: [], edges: [] }
+extension DiGraph {
+  static fn new() -> DiGraph<T> => DiGraph(nodes: [], edges: [])
 
-  fn addNode(self, value: T) -> DiGraph<T> {
-    return DiGraph { nodes: self.nodes + [value], edges: self.edges }
+  fn addNode(value: T) -> DiGraph<T> {
+    return DiGraph(nodes: self.nodes + [value], edges: self.edges)
   }
 
-  fn addEdge(self, from: Int, to: Int) -> DiGraph<T> {
-    return DiGraph { nodes: self.nodes, edges: self.edges + [(from, to)] }
+  fn addEdge(from: Int, to: Int) -> DiGraph<T> {
+    return DiGraph(nodes: self.nodes, edges: self.edges + [(from, to)])
   }
 
-  fn successors(self, node: Int) -> List<Int> {
+  fn successors(node: Int) -> List<Int> {
     var result: List<Int> = []
     for edge in self.edges {
-      let {a, b} = edge
+      let a = edge.0
+      let b = edge.1
       if a == node { result = result + [b] }
     }
     return result
   }
 
-  fn predecessors(self, node: Int) -> List<Int> {
+  fn predecessors(node: Int) -> List<Int> {
     var result: List<Int> = []
     for edge in self.edges {
-      let {a, b} = edge
+      let a = edge.0
+      let b = edge.1
       if b == node { result = result + [a] }
     }
     return result
   }
 
-  fn hasEdge(self, from: Int, to: Int) -> Bool {
+  fn hasEdge(from: Int, to: Int) -> Bool {
     for edge in self.edges {
-      let {a, b} = edge
+      let a = edge.0
+      let b = edge.1
       if a == from && b == to { return true }
     }
     return false
   }
 
-  fn inDegree(self, node: Int) -> Int => self.predecessors(node).length
-  fn outDegree(self, node: Int) -> Int => self.successors(node).length
+  fn inDegree(node: Int) -> Int => self.predecessors(node).length
+  fn outDegree(node: Int) -> Int => self.successors(node).length
 
-  fn topologicalSort(self) -> Option<List<Int>> {
+  fn topologicalSort() -> Option<List<Int>> {
     var inDeg: List<Int> = []
     var i = 0
     while i < self.nodes.length {
@@ -787,7 +818,7 @@ struct DiGraph<T> {
       i += 1
     }
     for edge in self.edges {
-      let {a, b} = edge
+      let b = edge.1
       inDeg = inDeg.set(b, inDeg[b] + 1)
     }
     var queue: List<Int> = []
@@ -812,14 +843,14 @@ struct DiGraph<T> {
     return .some(result)
   }
 
-  fn hasCycle(self) -> Bool {
+  fn hasCycle() -> Bool {
     match self.topologicalSort() {
       .none => true,
       .some(_) => false
     }
   }
 
-  fn bfs(self, start: Int) -> List<Int> {
+  fn bfs(start: Int) -> List<Int> {
     var visited: List<Bool> = []
     var i = 0
     while i < self.nodes.length {
@@ -843,7 +874,7 @@ struct DiGraph<T> {
     return result
   }
 
-  fn dfs(self, start: Int) -> List<Int> {
+  fn dfs(start: Int) -> List<Int> {
     var visited: List<Bool> = []
     var i = 0
     while i < self.nodes.length {
@@ -885,19 +916,21 @@ struct WeightedEdge {
 struct WeightedGraph<T> {
   nodes: List<T>
   edges: List<WeightedEdge>
+}
 
-  fn new() -> WeightedGraph<T> => WeightedGraph { nodes: [], edges: [] }
+extension WeightedGraph {
+  static fn new() -> WeightedGraph<T> => WeightedGraph(nodes: [], edges: [])
 
-  fn addNode(self, value: T) -> WeightedGraph<T> {
-    return WeightedGraph { nodes: self.nodes + [value], edges: self.edges }
+  fn addNode(value: T) -> WeightedGraph<T> {
+    return WeightedGraph(nodes: self.nodes + [value], edges: self.edges)
   }
 
-  fn addEdge(self, from: Int, to: Int, weight: Float) -> WeightedGraph<T> {
-    let edge = WeightedEdge { from: from, to: to, weight: weight }
-    return WeightedGraph { nodes: self.nodes, edges: self.edges + [edge] }
+  fn addEdge(from: Int, to: Int, weight: Float) -> WeightedGraph<T> {
+    let edge = WeightedEdge(from: from, to: to, weight: weight)
+    return WeightedGraph(nodes: self.nodes, edges: self.edges + [edge])
   }
 
-  fn neighbors(self, node: Int) -> List<(Int, Float)> {
+  fn neighbors(node: Int) -> List<(Int, Float)> {
     var result: List<(Int, Float)> = []
     for edge in self.edges {
       if edge.from == node { result = result + [(edge.to, edge.weight)] }
@@ -907,7 +940,7 @@ struct WeightedGraph<T> {
   }
 
   // Dijkstra — shortest path from source to target
-  fn shortestPath(self, source: Int, target: Int) -> Option<(Float, List<Int>)> {
+  fn shortestPath(source: Int, target: Int) -> Option<(Float, List<Int>)> {
     let n = self.nodes.length
     let inf = 1.0 / 0.0
 
@@ -953,7 +986,8 @@ struct WeightedGraph<T> {
       remaining -= 1
 
       for neighbor in self.neighbors(u) {
-        let {v, w} = neighbor
+        let v = neighbor.0
+        let w = neighbor.1
         let alt = dist[u] + w
         if alt < dist[v] {
           dist = dist.set(v, alt)
@@ -965,7 +999,7 @@ struct WeightedGraph<T> {
   }
 
   // Minimum Spanning Tree — Kruskal's algorithm
-  fn mst(self) -> WeightedGraph<T> {
+  fn mst() -> WeightedGraph<T> {
     let n = self.nodes.length
     // Sort edges by weight (insertion sort for simplicity)
     var sorted = self.edges
@@ -991,13 +1025,13 @@ struct WeightedGraph<T> {
       i += 1
     }
 
-    var result = WeightedGraph { nodes: self.nodes, edges: [] }
+    var result = WeightedGraph(nodes: self.nodes, edges: [])
 
     for edge in sorted {
       let rootA = _find(parent, edge.from)
       let rootB = _find(parent, edge.to)
       if rootA != rootB {
-        result = WeightedGraph { nodes: result.nodes, edges: result.edges + [edge] }
+        result = WeightedGraph(nodes: result.nodes, edges: result.edges + [edge])
         // Union by rank
         if rank[rootA] < rank[rootB] {
           parent = parent.set(rootA, rootB)

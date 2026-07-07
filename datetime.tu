@@ -9,29 +9,31 @@ struct DateTime {
   minute: Int
   second: Int
   ms: Int
+}
 
-  fn now() -> DateTime {
+extension DateTime {
+  static fn now() -> DateTime {
     let d = Date.now()
-    return DateTime {
+    return DateTime(
       year: d.year, month: d.month, day: d.day,
       hour: d.hour, minute: d.minute, second: d.second, ms: d.millisecond
-    }
+    )
   }
 
-  fn date(year: Int, month: Int, day: Int) -> DateTime {
-    return DateTime {
+  static fn date(year: Int, month: Int, day: Int) -> DateTime {
+    return DateTime(
       year: year, month: month, day: day,
       hour: 0, minute: 0, second: 0, ms: 0
-    }
+    )
   }
 
-  fn today() -> DateTime => DateTime.now().startOfDay()
-  fn tomorrow() -> DateTime => DateTime.today().addDays(1)
-  fn yesterday() -> DateTime => DateTime.today().addDays(-1)
+  static fn today() -> DateTime => DateTime.now().startOfDay()
+  static fn tomorrow() -> DateTime => DateTime.today().addDays(1)
+  static fn yesterday() -> DateTime => DateTime.today().addDays(-1)
 
   // === Arithmetic ===
 
-  fn addDays(self, n: Int) -> DateTime {
+  fn addDays(n: Int) -> DateTime {
     var d = self.day + n
     var m = self.month
     var y = self.year
@@ -48,88 +50,88 @@ struct DateTime {
     return self.{ year: y, month: m, day: d }
   }
 
-  fn addHours(self, n: Int) -> DateTime {
+  fn addHours(n: Int) -> DateTime {
     let totalMinutes = self.toMinutes() + n * 60
     return DateTime.fromMinutes(totalMinutes)
   }
 
-  fn addMinutes(self, n: Int) -> DateTime {
+  fn addMinutes(n: Int) -> DateTime {
     let totalMinutes = self.toMinutes() + n
     return DateTime.fromMinutes(totalMinutes)
   }
 
-  fn addSeconds(self, n: Int) -> DateTime {
+  fn addSeconds(n: Int) -> DateTime {
     let totalSec = self.toSeconds() + n
     return DateTime.fromSeconds(totalSec)
   }
 
   // === Comparison ===
 
-  fn isBefore(self, other: DateTime) -> Bool {
+  fn isBefore(other: DateTime) -> Bool {
     return self.toSeconds() < other.toSeconds()
   }
 
-  fn isAfter(self, other: DateTime) -> Bool {
+  fn isAfter(other: DateTime) -> Bool {
     return self.toSeconds() > other.toSeconds()
   }
 
-  fn isBetween(self, start: DateTime, end: DateTime) -> Bool {
+  fn isBetween(start: DateTime, end: DateTime) -> Bool {
     let s = self.toSeconds()
     return s >= start.toSeconds() && s <= end.toSeconds()
   }
 
-  fn isEqual(self, other: DateTime) -> Bool {
+  fn isEqual(other: DateTime) -> Bool {
     return self.toSeconds() == other.toSeconds()
   }
 
   // === Diff ===
 
-  fn diffInDays(self, other: DateTime) -> Int {
+  fn diffInDays(other: DateTime) -> Int {
     return (self.toSeconds() - other.toSeconds()) / 86400
   }
 
-  fn diffInHours(self, other: DateTime) -> Int {
+  fn diffInHours(other: DateTime) -> Int {
     return (self.toSeconds() - other.toSeconds()) / 3600
   }
 
-  fn diffInMinutes(self, other: DateTime) -> Int {
+  fn diffInMinutes(other: DateTime) -> Int {
     return (self.toSeconds() - other.toSeconds()) / 60
   }
 
-  fn diffInSeconds(self, other: DateTime) -> Int {
+  fn diffInSeconds(other: DateTime) -> Int {
     return self.toSeconds() - other.toSeconds()
   }
 
   // === Boundaries ===
 
-  fn startOfDay(self) -> DateTime {
+  fn startOfDay() -> DateTime {
     return self.{ hour: 0, minute: 0, second: 0, ms: 0 }
   }
 
-  fn endOfDay(self) -> DateTime {
+  fn endOfDay() -> DateTime {
     return self.{ hour: 23, minute: 59, second: 59, ms: 999 }
   }
 
-  fn startOfMonth(self) -> DateTime {
+  fn startOfMonth() -> DateTime {
     return self.{ day: 1, hour: 0, minute: 0, second: 0, ms: 0 }
   }
 
-  fn endOfMonth(self) -> DateTime {
+  fn endOfMonth() -> DateTime {
     let lastDay = _daysInMonth(self.month, self.year)
     return self.{ day: lastDay, hour: 23, minute: 59, second: 59, ms: 999 }
   }
 
-  fn startOfYear(self) -> DateTime {
+  fn startOfYear() -> DateTime {
     return self.{ month: 1, day: 1, hour: 0, minute: 0, second: 0, ms: 0 }
   }
 
-  fn endOfYear(self) -> DateTime {
+  fn endOfYear() -> DateTime {
     return self.{ month: 12, day: 31, hour: 23, minute: 59, second: 59, ms: 999 }
   }
 
   // === Formatting ===
 
-  fn format(self, pattern: String) -> String {
+  fn format(pattern: String) -> String {
     var result = pattern
     result = result.replaceAll("yyyy", _padInt(self.year, 4))
     result = result.replaceAll("MM", _padInt(self.month, 2))
@@ -140,11 +142,11 @@ struct DateTime {
     return result
   }
 
-  fn toIso(self) -> String {
+  fn toIso() -> String {
     return self.format("yyyy-MM-ddTHH:mm:ss")
   }
 
-  fn relative(self, now: DateTime) -> String {
+  fn relative(now: DateTime) -> String {
     let diffSec = now.toSeconds() - self.toSeconds()
     let absDiff = if diffSec < 0 { -diffSec } else { diffSec }
     let future = diffSec < 0
@@ -169,7 +171,7 @@ struct DateTime {
 
   // === Properties ===
 
-  fn dayOfWeek(self) -> Int {
+  fn dayOfWeek() -> Int {
     // Zeller's formula (0=Sunday, 6=Saturday)
     var m = self.month
     var y = self.year
@@ -180,50 +182,50 @@ struct DateTime {
     return ((h + 6) % 7)  // 0=Monday, 6=Sunday
   }
 
-  fn dayOfYear(self) -> Int {
+  fn dayOfYear() -> Int {
     let daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     var total = self.day
     var i = 0
     while i < self.month - 1 {
       total += daysPerMonth[i]
-      if i == 1 && _isLeapYear(self.year) { total += 1 }
+      if i == 1 && _leapYear(self.year) { total += 1 }
       i += 1
     }
     return total
   }
 
-  fn isLeapYear(self) -> Bool => _isLeapYear(self.year)
+  fn isLeapYear() -> Bool => _leapYear(self.year)
 
-  fn isWeekend(self) -> Bool {
+  fn isWeekend() -> Bool {
     let dow = self.dayOfWeek()
     return dow == 5 || dow == 6  // Saturday or Sunday
   }
 
   // === Internal ===
 
-  fn toSeconds(self) -> Int {
+  fn toSeconds() -> Int {
     // Simplified: days since epoch approximation
     var totalDays = 0
     var y = 1970
     while y < self.year {
-      totalDays += if _isLeapYear(y) { 366 } else { 365 }
+      totalDays += if _leapYear(y) { 366 } else { 365 }
       y += 1
     }
     totalDays += self.dayOfYear() - 1
     return totalDays * 86400 + self.hour * 3600 + self.minute * 60 + self.second
   }
 
-  fn toMinutes(self) -> Int => self.toSeconds() / 60
+  fn toMinutes() -> Int => self.toSeconds() / 60
 
-  fn fromMinutes(totalMin: Int) -> DateTime {
+  static fn fromMinutes(totalMin: Int) -> DateTime {
     return DateTime.fromSeconds(totalMin * 60)
   }
 
-  fn fromSeconds(totalSec: Int) -> DateTime {
+  static fn fromSeconds(totalSec: Int) -> DateTime {
     var remaining = totalSec
     var year = 1970
     while true {
-      let daysInYear = if _isLeapYear(year) { 366 } else { 365 }
+      let daysInYear = if _leapYear(year) { 366 } else { 365 }
       if remaining < daysInYear * 86400 {
         let dayOfYear = remaining / 86400
         remaining = remaining % 86400
@@ -236,14 +238,14 @@ struct DateTime {
         var day = dayOfYear + 1
         let daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         while month <= 12 {
-          let dim = if month == 2 && _isLeapYear(year) { 29 } else { daysPerMonth[month - 1] }
+          let dim = if month == 2 && _leapYear(year) { 29 } else { daysPerMonth[month - 1] }
           if day <= dim {
-            return DateTime { year: year, month: month, day: day, hour: hour, minute: minute, second: second, ms: 0 }
+            return DateTime(year: year, month: month, day: day, hour: hour, minute: minute, second: second, ms: 0)
           }
           day -= dim
           month += 1
         }
-        return DateTime { year: year, month: 12, day: 31, hour: hour, minute: minute, second: second, ms: 0 }
+        return DateTime(year: year, month: 12, day: 31, hour: hour, minute: minute, second: second, ms: 0)
       }
       remaining -= daysInYear * 86400
       year += 1
@@ -254,13 +256,13 @@ struct DateTime {
 
 // === Private helpers ===
 
-fn _isLeapYear(year: Int) -> Bool {
+fn _leapYear(year: Int) -> Bool {
   return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }
 
 fn _daysInMonth(month: Int, year: Int) -> Int {
   let days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-  if month == 2 && _isLeapYear(year) { return 29 }
+  if month == 2 && _leapYear(year) { return 29 }
   return days[month - 1]
 }
 

@@ -13,56 +13,58 @@ struct Logger {
   level: LogLevel
   name: String
   useColors: Bool
+}
 
-  fn new(name: String) -> Logger {
-    return Logger { level: .info, name: name, useColors: true }
+extension Logger {
+  static fn new(name: String) -> Logger {
+    return Logger(level: .info, name: name, useColors: true)
   }
 
-  fn withLevel(self, level: LogLevel) -> Logger {
+  fn withLevel(level: LogLevel) -> Logger {
     return self.{ level: level }
   }
 
-  fn withColors(self, enabled: Bool) -> Logger {
+  fn withColors(enabled: Bool) -> Logger {
     return self.{ useColors: enabled }
   }
 
-  fn debug(self, msg: String) {
-    self._log(.debug, msg, "")
+  fn debug(msg: String) {
+    self._writeLog(.debug, msg, "")
   }
 
-  fn debugCtx(self, msg: String, ctx: String) {
-    self._log(.debug, msg, ctx)
+  fn debugCtx(msg: String, ctx: String) {
+    self._writeLog(.debug, msg, ctx)
   }
 
-  fn info(self, msg: String) {
-    self._log(.info, msg, "")
+  fn info(msg: String) {
+    self._writeLog(.info, msg, "")
   }
 
-  fn infoCtx(self, msg: String, ctx: String) {
-    self._log(.info, msg, ctx)
+  fn infoCtx(msg: String, ctx: String) {
+    self._writeLog(.info, msg, ctx)
   }
 
-  fn warn(self, msg: String) {
-    self._log(.warn, msg, "")
+  fn warn(msg: String) {
+    self._writeLog(.warn, msg, "")
   }
 
-  fn warnCtx(self, msg: String, ctx: String) {
-    self._log(.warn, msg, ctx)
+  fn warnCtx(msg: String, ctx: String) {
+    self._writeLog(.warn, msg, ctx)
   }
 
-  fn error(self, msg: String) {
-    self._log(.error, msg, "")
+  fn error(msg: String) {
+    self._writeLog(.error, msg, "")
   }
 
-  fn errorCtx(self, msg: String, ctx: String) {
-    self._log(.error, msg, ctx)
+  fn errorCtx(msg: String, ctx: String) {
+    self._writeLog(.error, msg, ctx)
   }
 
-  fn fatal(self, msg: String) {
-    self._log(.fatal, msg, "")
+  fn fatal(msg: String) {
+    self._writeLog(.fatal, msg, "")
   }
 
-  fn _log(self, level: LogLevel, msg: String, ctx: String) {
+  fn _writeLog(level: LogLevel, msg: String, ctx: String) {
     if _levelValue(level) < _levelValue(self.level) { return }
     let prefix = _levelPrefix(level, self.useColors)
     let nameTag = if self.name.length > 0 { "[${self.name}] " } else { "" }
